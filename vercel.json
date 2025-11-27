@@ -26,11 +26,7 @@
   ],
   
   "functions": {
-<<<<<<< HEAD
     "api/**/*route.ts": { "maxDuration": 10 } 
-=======
-    "api/**/*.ts": { "maxDuration": 10 } 
->>>>>>> 7dbeb414769bc2d50c364bd7de43c275e926b57e
   },
   
   "rewrites": [
