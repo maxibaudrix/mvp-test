@@ -2,7 +2,7 @@
 // src/components/calculator/TDEECalculator.tsx
 // Componente de demostración o visualización de cálculo de TDEE
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/Card';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { useOnboardingStore } from '@/store/onboarding';
 import { calculateTDEE } from '@/lib/calculations'; // Asumimos esta función existe en Fase 5
 

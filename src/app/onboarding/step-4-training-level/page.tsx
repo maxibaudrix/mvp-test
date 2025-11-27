@@ -3,7 +3,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/card';
 import StepHeader from '@/components/onboarding/StepHeader';
 import StepButtons from '@/components/onboarding/StepButtons';
 import { useOnboardingForm, lifestyleSchema } from '@/hooks/useOnboardingForm';

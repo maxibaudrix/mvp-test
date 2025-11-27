@@ -1,159 +1,154 @@
-// src/components/scanner/CameraScanner.tsx
-"use client";
-import React, { useEffect, useRef, useState } from "react";
+// C:\Users\maxib\web-app\MVP\sporvit-mvp\src\components\scanner\CameraScanner.tsx
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { Scan, X, Loader2 } from 'lucide-react';
+// Asumo que tienes un componente Button, si no, usa un botón simple de HTML.
 
-type CameraScannerProps = {
+interface CameraScannerProps {
   onDetected: (code: string) => void;
-  formats?: string[]; // e.g. ["ean_13", "qr_code"]
-  facingMode?: "environment" | "user";
-  scanIntervalMs?: number;
-};
+  onStop: () => void;
+}
 
-export default function CameraScanner({
-  onDetected,
-  formats = ["ean_13", "ean_8", "qr_code"],
-  facingMode = "environment",
-  scanIntervalMs = 500,
-}: CameraScannerProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [supported, setSupported] = useState<boolean | null>(null);
-  const barcodeDetectorRef = useRef<any>(null);
-  const scanningRef = useRef(false);
+// Placeholder para un componente Button simple con Tailwind (Ajusta si usas un componente UI real)
+const Button: React.FC<{ children: React.ReactNode; onClick: () => void; className?: string }> = ({ children, onClick, className = '' }) => (
+    <button
+        onClick={onClick}
+        className={`flex items-center justify-center px-3 py-1 font-semibold transition-colors duration-200 rounded-lg shadow-md bg-red-600 hover:bg-red-700 text-white ${className}`}
+    >
+        {children}
+    </button>
+);
+
+const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const lastDetectedRef = useRef<string | null>(null);
+  const codeReaderRef = useRef<any>(null); // Almacenar el lector para resetearlo
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    let mounted = true;
+  // Lógica de escaneo continuo
+  const startScan = useCallback(async () => {
+    if (!videoRef.current) return;
 
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode },
-          audio: false,
-        });
-        if (!mounted) return;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
-      } catch (err: any) {
-        setError("No se pudo acceder a la cámara: " + err.message);
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Importación dinámica de ZXing
+      const ZXing = await import("@zxing/library");
+      
+      // Inicializar el lector si no existe
+      if (!codeReaderRef.current) {
+        // Usamos BrowserMultiFormatReader para soportar varios formatos (Barcode, QR, etc.)
+        codeReaderRef.current = new ZXing.BrowserMultiFormatReader();
       }
-    }
+      
+      const codeReader = codeReaderRef.current;
 
-    // Try native BarcodeDetector
-    async function initDetector() {
-      // @ts-ignore
-      if ("BarcodeDetector" in window) {
-        try {
-          // @ts-ignore
-          const supportedFormats = await (window as any).BarcodeDetector.getSupportedFormats();
-          // If formats we want are supported -> use native
-          const formatsToUse = formats.filter((f) =>
-            supportedFormats.includes(f)
-          );
-          // @ts-ignore
-          barcodeDetectorRef.current = new (window as any).BarcodeDetector({
-            formats: formatsToUse.length ? formatsToUse : supportedFormats,
-          });
-          setSupported(true);
-        } catch (e) {
-          console.warn("BarcodeDetector init failed", e);
-          setSupported(false);
-        }
-      } else {
-        setSupported(false);
+      // Obtener la primera cámara disponible
+      const videoInputDevices = await codeReader.listVideoInputDevices();
+      const firstDeviceId = videoInputDevices[0]?.deviceId;
+
+      if (!firstDeviceId) {
+        setError("No se encontraron dispositivos de cámara.");
+        setIsLoading(false);
+        return;
       }
-    }
+      
+      setIsLoading(false);
 
-    startCamera();
-    initDetector();
+      // Iniciar el escaneo y decodificación.
+      // Se usa .decodeFromVideoDevice para un escaneo continuo
+      codeReader.decodeFromVideoDevice(firstDeviceId, videoRef.current, (result: any, scanError: any) => {
+        if (scanError) {
+          // Ignorar errores comunes (ej. código no encontrado)
+          if (scanError.name !== "NotFoundException") {
+             // console.error("ZXing Error:", scanError); 
+          }
+          return;
+        }
 
-    return () => {
-      mounted = false;
-      const tracks = (videoRef.current?.srcObject as MediaStream | null)?.getTracks?.() || [];
-      tracks.forEach((t) => t.stop());
-    };
-  }, [facingMode, formats]);
+        if (result) {
+          // *** CORRECCIÓN DEL ERROR DE TIPADO (CÓDIGO 2341) ***
+          // Accedemos a 'text' usando el método público 'getText()'
+          const decodedText = (result as any)?.getText ? (result as any).getText() : (result as any).text;
 
-  useEffect(() => {
-    let rafId: number | null = null;
-    let intervalId: number | null = null;
-
-    async function scanFrameNative() {
-      if (!videoRef.current || !barcodeDetectorRef.current) return;
-      try {
-        const detections = await barcodeDetectorRef.current.detect(videoRef.current);
-        if (detections && detections.length) {
-          const code = detections[0].rawValue || detections[0].raw_value || detections[0].rawData;
-          if (code && lastDetectedRef.current !== code) {
-            lastDetectedRef.current = code;
-            onDetected(code);
+          if (decodedText && lastDetectedRef.current !== decodedText) {
+            lastDetectedRef.current = decodedText;
+            onDetected(decodedText);
+            
+            // Detener el escaneo después de una detección exitosa para evitar re-detecciones
+            stopScan();
           }
         }
-      } catch (e) {
-        console.warn("native detect error", e);
-      }
+      });
+      
+    } catch (err: any) {
+      console.error("Error al inicializar el scanner:", err);
+      setError("No se pudo iniciar el escáner. Asegúrate de dar permisos de cámara.");
+      setIsLoading(false);
     }
-
-    async function scanUsingZXing() {
-      // dynamic import to avoid forcing dependency
-      try {
-        const ZXing = await import("@zxing/library");
-        const codeReader = new ZXing.BrowserMultiFormatReader();
-        if (!videoRef.current) return;
-
-        try {
-          const result = await codeReader.decodeOnceFromVideoDevice(undefined, videoRef.current);
-          if (result?.text) {
-            if (lastDetectedRef.current !== result.text) {
-              lastDetectedRef.current = result.text;
-              onDetected(result.text);
-            }
-          }
-        } catch (err) {
-          // decodeOnceFromVideoDevice throws when no code found; ignore
-        } finally {
-          codeReader.reset();
-        }
-      } catch (err) {
-        console.error("ZXing dynamic import failed", err);
-      }
+  }, [onDetected]);
+  
+  // Función para detener y limpiar el escáner
+  const stopScan = useCallback(() => {
+    if (codeReaderRef.current) {
+        codeReaderRef.current.reset();
     }
+    onStop();
+  }, [onStop]);
 
-    async function loop() {
-      scanningRef.current = true;
-      if ((window as any).BarcodeDetector && barcodeDetectorRef.current) {
-        // poll at interval
-        intervalId = window.setInterval(scanFrameNative, scanIntervalMs);
-      } else {
-        // fallback - try ZXing periodically
-        intervalId = window.setInterval(scanUsingZXing, scanIntervalMs);
-      }
-    }
-
-    loop();
-
+  useEffect(() => {
+    startScan();
+    
+    // Cleanup: Detener y resetear el lector al desmontar el componente
     return () => {
-      scanningRef.current = false;
-      if (rafId) cancelAnimationFrame(rafId);
-      if (intervalId) clearInterval(intervalId);
+        if (codeReaderRef.current) {
+            codeReaderRef.current.reset();
+            codeReaderRef.current = null;
+        }
     };
-  }, [onDetected, scanIntervalMs]);
+  }, [startScan]);
+
 
   return (
-    <div className="w-full h-full relative">
-      <video
-        ref={videoRef}
-        className="w-full h-full object-cover rounded-lg bg-black"
-        playsInline
-        muted
-      />
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-black/60 text-white p-3 rounded">{error}</div>
+    <div className="relative rounded-xl overflow-hidden bg-black min-h-[300px] shadow-2xl">
+      {/* Video Stream - importante que el elemento VIDEO esté presente */}
+      <video ref={videoRef} className="w-full h-full object-cover transform scale-x-[-1]" playsInline muted />
+      
+      {/* Overlay de Carga */}
+      {isLoading && !error && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white">
+            <Loader2 className="w-8 h-8 animate-spin mb-3" />
+            <p>Iniciando cámara y lector...</p>
         </div>
       )}
+
+      {/* Overlay con zona de escaneo y error */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        {/* Marcador de Escaneo */}
+        {!isLoading && !error && (
+            <div className="w-3/4 h-32 border-2 border-dashed border-green-500 rounded-lg backdrop-blur-sm bg-black/10 flex items-center justify-center transition-all duration-300 ease-in-out">
+              <Scan className="w-8 h-8 text-green-500 animate-pulse" />
+            </div>
+        )}
+        
+        {/* Mensaje de Error */}
+        {error && (
+            <div className="p-3 mt-4 bg-red-800/90 text-white text-center font-medium rounded-lg pointer-events-auto max-w-xs">
+              {error}
+            </div>
+        )}
+      </div>
+
+      {/* Botón de Parar */}
+      <div className="absolute top-4 right-4 pointer-events-auto">
+        <Button onClick={stopScan} className="bg-red-500 hover:bg-red-600 p-3 rounded-full shadow-lg">
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
+
     </div>
   );
-}
+};
+
+export default CameraScanner;

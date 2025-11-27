@@ -35,4 +35,12 @@ export interface AuthenticatedUser {
   email: string | undefined;
   // Añadimos el perfil para acceder a los datos biométricos
   profile: UserProfile | null;
+  // AÑADIDO (Resuelve el error 'name' en page.tsx)
+    name: string | null; 
+
+    // Relaciones (ambas existen en el modelo User de Prisma)
+    profile: UserProfileType | null;
+    
+    // AÑADIDO (Resuelve el error 'goals' en page.tsx)
+    goals: UserGoalsType | null;
 }

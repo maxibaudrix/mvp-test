@@ -1,54 +1,81 @@
-// src/components/scanner/ProductCard.tsx
-import React from "react";
-import ScoreIndicator from "./ScoreIndicator";
-
-type Product = {
+// C:\Users\maxib\web-app\MVP\sporvit-mvp\src\components\scanner\ProductCard.tsx
+import React from 'react';
+// Asumo que 'ProductData' se importa desde tus tipos (ej. src/types/product.d.ts)
+// Si no existe, define la interfaz localmente o crea el archivo de tipos.
+interface ProductData {
+  name: string;
   code: string;
-  product_name?: string;
-  brands?: string;
-  image_url?: string;
-  nutriments?: any;
-  nutriscore_grade?: string | null;
-  nova_group?: number | null;
-};
-
-export default function ProductCard({
-  product,
-  score,
-  onOpen,
-}: {
-  product: Product;
-  score: number | null;
-  onOpen?: () => void;
-}) {
-  return (
-    <article className="border rounded-lg p-4 flex gap-4 items-start">
-      <img
-        src={product.image_url || "/placeholder-food.png"}
-        alt={product.product_name || "Producto"}
-        width={96}
-        height={96}
-        className="object-cover rounded"
-      />
-      <div className="flex-1">
-        <h3 className="text-lg font-semibold">{product.product_name || "Sin nombre"}</h3>
-        <p className="text-sm text-muted-foreground">{product.brands || "Marca desconocida"}</p>
-        <div className="mt-2 flex items-center gap-3">
-          <ScoreIndicator score={score} />
-          <div className="text-sm">
-            <div>Nutri-Score: {product.nutriscore_grade || "N/A"}</div>
-            <div>NOVA: {product.nova_group ?? "N/A"}</div>
-          </div>
-        </div>
-        <div className="mt-3">
-          <button
-            onClick={onOpen}
-            className="px-3 py-1 rounded bg-sky-600 text-white text-sm hover:opacity-90"
-          >
-            Ver ficha
-          </button>
-        </div>
-      </div>
-    </article>
-  );
+  nutriscoreGrade: 'A' | 'B' | 'C' | 'D' | 'E';
+  novaGroup: 1 | 2 | 3 | 4;
+  calories: number; // por 100g
+  protein: number; // por 100g
+  carbs: number; // por 100g
+  fat: number; // por 100g
+  servingSize: number; // gramos
+  brand: string;
 }
+
+interface ProductCardProps {
+    product: ProductData;
+    onClose: () => void;
+}
+
+// Placeholder para un componente Card simple con Tailwind
+const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
+  <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden ${className}`}>
+    {children}
+  </div>
+);
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, onClose }) => {
+    // Determinar color de Nutri-Score
+    let nutriscoreColor = 'text-gray-600 bg-gray-200';
+    if (product.nutriscoreGrade === 'A') nutriscoreColor = 'text-white bg-green-600';
+    else if (product.nutriscoreGrade === 'B') nutriscoreColor = 'text-white bg-lime-500';
+    else if (product.nutriscoreGrade === 'C') nutriscoreColor = 'text-white bg-yellow-500';
+    else if (product.nutriscoreGrade === 'D') nutriscoreColor = 'text-white bg-orange-500';
+    else if (product.nutriscoreGrade === 'E') nutriscoreColor = 'text-white bg-red-600';
+
+    // Determinar color de NOVA Group
+    let novaGroupColor = 'text-gray-600';
+    if (product.novaGroup === 1) novaGroupColor = 'text-green-500 border-green-500';
+    else if (product.novaGroup === 4) novaGroupColor = 'text-red-500 border-red-500';
+    else if (product.novaGroup === 3) novaGroupColor = 'text-orange-500 border-orange-500';
+    else novaGroupColor = 'text-yellow-500 border-yellow-500';
+
+    return (
+        <Card className="p-4 border-l-4 border-green-500 bg-white dark:bg-gray-800 relative">
+            <button
+                onClick={onClose}
+                className="absolute top-3 right-3 p-1 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Cerrar resultados"
+            >
+                &times;
+            </button>
+            <h4 className="font-bold text-2xl text-gray-900 dark:text-white mb-1">{product.name}</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Marca: {product.brand} | Código: {product.code}</p>
+            
+            <div className="flex flex-wrap gap-4 items-center mb-4 border-t border-gray-100 dark:border-gray-700 pt-4">
+                <div className={`px-4 py-2 rounded-lg text-lg font-extrabold shadow-md ${nutriscoreColor}`}>
+                    Nutri-Score: {product.nutriscoreGrade}
+                </div>
+                <div className={`px-4 py-2 rounded-lg text-lg font-bold border-2 ${novaGroupColor}`}>
+                    NOVA Group: {product.novaGroup}
+                </div>
+            </div>
+
+            <h5 className="font-semibold text-base mt-4 mb-2 text-gray-900 dark:text-white border-b pb-1">Nutrición (por 100g)</h5>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700 dark:text-gray-300">
+                <p><strong>Calorías:</strong> {product.calories} kcal</p>
+                <p><strong>Proteínas:</strong> {product.protein} g</p>
+                <p><strong>Carbohidratos:</strong> {product.carbs} g</p>
+                <p><strong>Grasas:</strong> {product.fat} g</p>
+            </div>
+            <p className="text-xs mt-3 text-gray-500 dark:text-gray-500">
+                Tamaño de la porción: {product.servingSize}g.
+            </p>
+        </Card>
+    );
+}
+
+export default ProductCard;

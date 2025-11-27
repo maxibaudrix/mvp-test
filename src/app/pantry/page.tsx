@@ -6,7 +6,7 @@ import AppShell from '@/components/shared/layout/AppShell';
 import { usePantryStore } from '@/store/pantry';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 
 export default function PantryPage() {
   const { items, addItem, removeItem } = usePantryStore();

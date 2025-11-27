@@ -1,4 +1,5 @@
 // src/app/scanner/page.tsx
+'use client';
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import ProductCard from "@/components/scanner/ProductCard";
@@ -42,7 +43,10 @@ export default function ScannerPage() {
       <h1 className="text-2xl font-bold mb-4">Smart Product Scanner</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="rounded-lg overflow-hidden border">
-          <CameraScanner onDetected={handleDetected} />
+          <CameraScanner 
+            onDetected={handleDetected} 
+            onStop={() => console.log('Scanner stopped')} 
+          />
         </div>
 
         <div>
@@ -51,7 +55,7 @@ export default function ScannerPage() {
           </div>
           {loading && <div>Buscando producto…</div>}
           {product ? (
-            <ProductCard product={product} score={score} onOpen={() => (location.href = `/product/${product.code}`)} />
+            <ProductCard product={product} onClose={() => setProduct(null)} />
           ) : (
             <div className="text-sm text-muted-foreground">Escanea un código de barras para ver la ficha del producto.</div>
           )}

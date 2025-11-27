@@ -1,7 +1,7 @@
 // src/components/training/WorkoutCard.tsx
 import React from 'react';
 import { Workout } from '@/types/training';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Trophy, BarChart } from 'lucide-react';
 

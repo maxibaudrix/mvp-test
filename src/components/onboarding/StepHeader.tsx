@@ -1,6 +1,6 @@
 
 // src/components/onboarding/StepHeader.tsx
-import { CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
+import { CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/Progress';
 
 interface StepHeaderProps {

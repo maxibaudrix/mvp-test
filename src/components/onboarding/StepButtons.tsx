@@ -1,7 +1,7 @@
 
 // src/components/onboarding/StepButtons.tsx
-import { Button } from '@/components/ui/Button';
-import { CardFooter } from '@/components/ui/Card';
+import { Button } from '@/components/ui/button';
+import { CardFooter } from '@/components/ui/card';
 import Link from 'next/link';
 
 interface StepButtonsProps {

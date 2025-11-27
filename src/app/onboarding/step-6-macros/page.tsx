@@ -3,9 +3,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardFooter } from '@/components/ui/Card';
+import { Card, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import StepHeader from '@/components/onboarding/StepHeader';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import IMCCalculator from '@/components/calculator/IMCCalculator';
 import { TDEECalculator } from '@/components/calculator/TDEECalculator';
 import { MacrosCalculator } from '@/components/calculator/MacrosCalculator';

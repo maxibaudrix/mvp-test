@@ -25,8 +25,8 @@ export default function HomePage() {
     return (
       <AppShell title="Dashboard">
         <div className="p-4 md:p-8">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">¡Bienvenido de vuelta, {user.firstName || 'Usuario'}!</h1>
-          <p className="text-gray-600">Tu TDEE es de {user.profile?.tdee} kcal. Hora de revisar tu plan.</p>
+          <h1 className="text-3xl font-bold mb-6 text-gray-800">¡Bienvenido de vuelta, {user.name || 'Usuario'}!</h1>
+          <p className="text-gray-600">Tu TDEE es de {user.goals?.tdee} kcal. Hora de revisar tu plan.</p>
           <div className="mt-8">
              {/* Aquí irían las métricas del dashboard */}
              <Button>Ver Plan Nutricional</Button>

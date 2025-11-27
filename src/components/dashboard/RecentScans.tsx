@@ -1,6 +1,6 @@
 // src/components/dashboard/RecentScans.tsx
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScanBarcode } from 'lucide-react';
 
 // Mock types si no existen los de scanner
