@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -18,20 +18,20 @@ model User {
   emailVerified DateTime?
   name          String?
   image         String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Relations
-  accounts      Account[]
-  sessions      Session[]
-  profile       UserProfile?
-  goals         UserGoals?
+  accounts        Account[]
+  sessions        Session[]
+  profile         UserProfile?
+  goals           UserGoals?
   scannedProducts ScannedProduct[]
-  meals         Meal[]
-  workouts      Workout[]
-  progress      ProgressTracking[]
-  recipes       Recipe[]
+  meals           Meal[]
+  workouts        Workout[]
+  progress        ProgressTracking[]
+  recipes         Recipe[]
 }
 
 model Account {
@@ -86,13 +86,13 @@ model UserProfile {
   bodyFat       Float?
 
   // Activity
-  activityLevel String // sedentary, light, moderate, active
-  workoutDaysPerWeek Int @default(0)
+  activityLevel      String // sedentary, light, moderate, active
+  workoutDaysPerWeek Int    @default(0)
 
   // Preferences
-  dietType      String? // omnivore, vegetarian, vegan, keto, paleo
-  allergies     String[]
-  excludedIngredients String[]
+  dietType            String? // omnivore, vegetarian, vegan, keto, paleo
+  allergies           String?
+  excludedIngredients String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -104,10 +104,10 @@ model UserGoals {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Goals
-  goalType   String // cut, bulk, maintain, recomp
-  goalSpeed  String? // slow, moderate, aggressive
+  goalType     String // cut, bulk, maintain, recomp
+  goalSpeed    String? // slow, moderate, aggressive
   targetWeight Float
-  targetDate DateTime?
+  targetDate   DateTime?
 
   // Calculated targets
   targetCalories Int
@@ -136,20 +136,20 @@ model ScannedProduct {
   barcode     String
   productName String
   brands      String?
-  categories  String[]
+  categories  String?
 
   // Scores
   nutriscoreGrade String? // A, B, C, D, E
-  novaGroup       Int?    // 1, 2, 3, 4
+  novaGroup       Int? // 1, 2, 3, 4
   ecoscoreGrade   String?
 
   // Nutritional data (per 100g)
-  energyKcal      Float?
-  proteinsG       Float?
-  carbohydratesG  Float?
-  fatG            Float?
-  fiberG          Float?
-  saltG           Float?
+  energyKcal     Float?
+  proteinsG      Float?
+  carbohydratesG Float?
+  fatG           Float?
+  fiberG         Float?
+  saltG          Float?
 
   // User serving
   servingSizeG Float?
@@ -158,8 +158,8 @@ model ScannedProduct {
   sporvitScore String? // GREEN, YELLOW, RED
   scoreReason  String?
 
-  imageUrl   String?
-  scannedAt  DateTime @default(now())
+  imageUrl  String?
+  scannedAt DateTime @default(now())
 
   @@index([userId, scannedAt])
 }
@@ -197,15 +197,15 @@ model Workout {
   date        DateTime
   workoutType String // strength, cardio, hiit, rest
 
-  title            String
-  description      String?
-  durationMinutes  Int
+  title             String
+  description       String?
+  durationMinutes   Int
   estimatedCalories Int
 
-  completed          Boolean   @default(false)
-  completedAt        DateTime?
-  actualDurationMin  Int?
-  actualCalories     Int?
+  completed         Boolean   @default(false)
+  completedAt       DateTime?
+  actualDurationMin Int?
+  actualCalories    Int?
 
   // AI adaptation
   adaptedFromCalories Int?
