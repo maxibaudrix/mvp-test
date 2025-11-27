@@ -1,28 +1,22 @@
 {
-  // Configuración de versión de build
   "version": 2,
   
-  // Headers de seguridad: Mejoran el score de seguridad de la aplicación
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        // HSTS: Asegura que la comunicación siempre sea sobre HTTPS
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
         },
-        // CSP: Bloquea scripts y recursos no confiables (debe ser ajustado)
         {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*; font-src 'self';"
         },
-        // X-Content-Type-Options: Previene ataques de tipo MIME-sniffing
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
         },
-        // X-Frame-Options: Previene clickjacking
         {
           "key": "X-Frame-Options",
           "value": "DENY"
@@ -31,13 +25,10 @@
     }
   ],
   
-  // Configuración de funciones serverless (opcional, pero útil para Next.js)
   "functions": {
-    // Aumentar el tiempo de espera para funciones intensivas si es necesario
     "api/**/*.ts": { "maxDuration": 10 } 
   },
   
-  // Rewrites (opcional, para rutas limpias)
   "rewrites": [
     {
       "source": "/api/v1/:path*",
