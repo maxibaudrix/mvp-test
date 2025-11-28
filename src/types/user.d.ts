@@ -25,6 +25,30 @@ export interface UserProfile {
   
   targetWeightKg: number | null;
   weeklyGoalKg: number | null;
+  
+  // AÑADIDO: Metas nutricionales
+  targetCalories: number | null;
+  targetMacros: {
+    protein: number;
+    carbs: number;
+    fat: number;
+  } | null;
+}
+
+/**
+ * Tipo para las metas del usuario
+ */
+export interface UserGoals {
+  id: string;
+  userId: string;
+  targetCalories: number | null;
+  targetMacros: {
+    protein: number;
+    carbs: number;
+    fat: number;
+  } | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -33,14 +57,9 @@ export interface UserProfile {
 export interface AuthenticatedUser {
   id: string;
   email: string | undefined;
-  // Añadimos el perfil para acceder a los datos biométricos
+  name: string | null;
+  
+  // Relaciones (ambas existen en el modelo User de Prisma)
   profile: UserProfile | null;
-  // AÑADIDO (Resuelve el error 'name' en page.tsx)
-    name: string | null; 
-
-    // Relaciones (ambas existen en el modelo User de Prisma)
-    profile: UserProfileType | null;
-    
-    // AÑADIDO (Resuelve el error 'goals' en page.tsx)
-    goals: UserGoalsType | null;
+  goals: UserGoals | null;
 }
