@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { useOnboardingStore } from '@/store/onboarding';
 // 1. CORRECCIÓN: Debes importar las funciones de cálculo. 
 // Asumiré que están en una carpeta de utilidades. Si no las tienes, ver abajo.
-import { calculateGoalCalories, calculateMaintenanceMacros } from '@/lib/calculators'; 
+import { calculateGoalCalories, calculateMaintenanceMacros } from '@/lib/calculations'; 
 
 // 2. CORRECCIÓN: Definir interfaz para las props del sub-componente
 interface MacroItemProps {
@@ -19,7 +19,7 @@ export const MacrosCalculator = () => {
     const { data } = useOnboardingStore();
     
     // Nota: Asegúrate de que 'weeklyTarget' exista en tu store (ver paso extra abajo)
-    if (!data.goal || !data.weight || !data.heightCm) {
+    if (!data.goal || !data.weightKg || !data.heightCm) {
         return <p className="text-slate-400">Faltan datos para calcular los macros.</p>;
     }
 
