@@ -1,31 +1,38 @@
-import { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-import { PrismaAdapter } from '@auth/prisma-adapter';
-import { prisma } from './db';
+import NextAuth, { type NextAuthConfig } from "next-auth"
+import Google from "next-auth/providers/google"
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "./db"
 
-export const authOptions: NextAuthOptions = {
+export const config: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
+
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    // Añade más providers aquí (GitHub, etc.)
   ],
+
+  session: {
+    strategy: "jwt",
+  },
+
   callbacks: {
-    async session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
+    async session({ session, token }) {
+      if (session?.user && token?.sub) {
+        session.user.id = token.sub
       }
-      return session;
+      return session
     },
   },
+
   pages: {
-    signIn: '/login',
-    error: '/error',
+    signIn: "/login",
+    error: "/error",
   },
-  session: {
-    strategy: 'database',
-  },
+
   secret: process.env.AUTH_SECRET,
-};
+}
+
+// Export required by NextAuth for App Router
+export const { handlers, auth, signIn, signOut } = NextAuth(config)
