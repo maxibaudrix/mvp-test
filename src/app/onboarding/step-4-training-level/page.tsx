@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
 import { AlertCircle } from 'lucide-react';
 
+
 const NEXT_PATH = '/onboarding/step-5-diet';
 const PREV_PATH = '/onboarding/step-3-lifestyle';
 
@@ -24,6 +25,11 @@ const ActivityOptions = [
 
 export default function Step4TrainingLevelPage() {
   const router = useRouter();
+
+const FieldErrorMessage = ({ message }: { message?: string }) => {
+  if (!message) return null;
+  return <p className="text-red-500 text-xs mt-1">{message}</p>;
+};
 
   const {
     register,
@@ -59,7 +65,7 @@ export default function Step4TrainingLevelPage() {
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
-            {errors.activityLevel && <p className="text-red-500 text-xs mt-1">{errors.activityLevel.message}</p>}
+            <FieldErrorMessage message={errors.activityLevel?.message?.toString()} />
           </div>
 
           {/* Objetivo */}
@@ -87,7 +93,7 @@ export default function Step4TrainingLevelPage() {
                 </Label>
               ))}
             </div>
-            {errors.goal && <p className="text-red-500 text-xs mt-1">{errors.goal.message}</p>}
+            <FieldErrorMessage message={errors.goal?.message?.toString()} />
           </div>
 
           {/* Meta Semanal */}
@@ -108,7 +114,7 @@ export default function Step4TrainingLevelPage() {
                 <AlertCircle className="w-3 h-3 text-yellow-500" />
                 Recomendado entre 0.25 kg y 1.5 kg por semana.
               </p>
-              {errors.weeklyTarget && <p className="text-red-500 text-xs mt-1">{errors.weeklyTarget.message}</p>}
+              <FieldErrorMessage message={errors.weeklyTarget?.message?.toString()} />
             </div>
           )}
 
