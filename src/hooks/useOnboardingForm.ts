@@ -23,6 +23,12 @@ type StepKey = keyof typeof stepActions;
  * - `onSubmitCallback`: opcional, se ejecuta después de guardar en el store
  */
 
+export const lifestyleSchema = z.object({
+  activityLevel: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+  sleepHours: z.number().min(0).max(24),
+  stressLevel: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+});
+
 export const dietSchema = z.object({
   dietType: z.enum(['NONE', 'VEGETARIAN', 'VEGAN', 'PALEO', 'KETO']),
   allergens: z.string().optional(),
