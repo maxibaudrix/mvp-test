@@ -32,6 +32,7 @@ export interface UserProfile {
     protein: number;
     carbs: number;
     fat: number;
+    tdee
   } | null;
 }
 
@@ -47,6 +48,7 @@ export interface UserGoals {
     carbs: number;
     fat: number;
   } | null;
+  tdee?: number; // <-- agregar esta línea (opcional si puede no existir)
   createdAt: string;
   updatedAt: string;
 }
