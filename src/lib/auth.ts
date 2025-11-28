@@ -34,5 +34,6 @@ export const config: NextAuthConfig = {
   secret: process.env.AUTH_SECRET,
 }
 
-// Export required by NextAuth for App Router
-export const { handlers, auth, signIn, signOut } = NextAuth(config)
+const { handlers, auth, signIn, signOut } = NextAuth(config)
+
+export { handlers, auth, signIn, signOut }
