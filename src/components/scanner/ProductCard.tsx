@@ -1,23 +1,23 @@
-// C:\Users\maxib\web-app\MVP\sporvit-mvp\src\components\scanner\ProductCard.tsx
+// src/components/scanner/ProductCard.tsx
 import React from 'react';
-// Asumo que 'ProductData' se importa desde tus tipos (ej. src/types/product.d.ts)
-// Si no existe, define la interfaz localmente o crea el archivo de tipos.
+
 interface ProductData {
   name: string;
   code: string;
   nutriscoreGrade: 'A' | 'B' | 'C' | 'D' | 'E';
   novaGroup: 1 | 2 | 3 | 4;
-  calories: number; // por 100g
-  protein: number; // por 100g
-  carbs: number; // por 100g
-  fat: number; // por 100g
-  servingSize: number; // gramos
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  servingSize: number;
   brand: string;
 }
 
 interface ProductCardProps {
     product: ProductData;
-    onClose: () => void;
+    score?: number | null; // <-- agregado
+    onOpen: () => void;    // <-- renombrado
 }
 
 // Placeholder para un componente Card simple con Tailwind
@@ -27,8 +27,7 @@ const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ chi
   </div>
 );
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onClose }) => {
-    // Determinar color de Nutri-Score
+const ProductCard: React.FC<ProductCardProps> = ({ product, score, onOpen }) => {
     let nutriscoreColor = 'text-gray-600 bg-gray-200';
     if (product.nutriscoreGrade === 'A') nutriscoreColor = 'text-white bg-green-600';
     else if (product.nutriscoreGrade === 'B') nutriscoreColor = 'text-white bg-lime-500';
@@ -36,7 +35,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClose }) => {
     else if (product.nutriscoreGrade === 'D') nutriscoreColor = 'text-white bg-orange-500';
     else if (product.nutriscoreGrade === 'E') nutriscoreColor = 'text-white bg-red-600';
 
-    // Determinar color de NOVA Group
     let novaGroupColor = 'text-gray-600';
     if (product.novaGroup === 1) novaGroupColor = 'text-green-500 border-green-500';
     else if (product.novaGroup === 4) novaGroupColor = 'text-red-500 border-red-500';
@@ -46,9 +44,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClose }) => {
     return (
         <Card className="p-4 border-l-4 border-green-500 bg-white dark:bg-gray-800 relative">
             <button
-                onClick={onClose}
+                onClick={onOpen}
                 className="absolute top-3 right-3 p-1 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Cerrar resultados"
+                aria-label="Abrir detalles"
             >
                 &times;
             </button>
@@ -63,6 +61,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClose }) => {
                     NOVA Group: {product.novaGroup}
                 </div>
             </div>
+
+            {score !== undefined && (
+              <p className="text-sm font-semibold text-blue-600 mb-2">Score personalizado: {score}</p>
+            )}
 
             <h5 className="font-semibold text-base mt-4 mb-2 text-gray-900 dark:text-white border-b pb-1">Nutrición (por 100g)</h5>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-700 dark:text-gray-300">
