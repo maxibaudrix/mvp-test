@@ -4,16 +4,19 @@
 
 // Paso 1: Biometría
 export interface BiometricsData {
-  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  gender: 'male' | 'female' | 'other';
   dateOfBirth: string;
+  heightCm: number;
+  weightKg: number;
+  age: number; // Asumo que la edad se calcula en el front-end y se guarda aquí.
   heightCm: number;
   weightKg: number;
 }
 
 // Paso 2: Objetivos y Actividad
 export interface GoalData {
-  activityLevel: 'SEDENTARY' | 'LIGHTLY_ACTIVE' | 'MODERATELY_ACTIVE' | 'VERY_ACTIVE' | 'EXTREMELY_ACTIVE';
-  goal: 'LOSE_WEIGHT' | 'MAINTAIN' | 'GAIN_MUSCLE';
+  activityLevel: 'sedentary' | 'light' | 'moderate' | 'very_active' | 'extra_active';
+  goal: 'lose_weight' | 'maintain' | 'gain_muscle';
   targetWeightKg: number;
   weeklyGoalKg: number;
 }
