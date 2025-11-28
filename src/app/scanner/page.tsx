@@ -55,7 +55,7 @@ export default function ScannerPage() {
           </div>
           {loading && <div>Buscando producto…</div>}
           {product ? (
-            <ProductCard product={product} onClose={() => setProduct(null)} />
+            <ProductCard product={product} onOpen={() => setProduct(null)} score={score} />
           ) : (
             <div className="text-sm text-muted-foreground">Escanea un código de barras para ver la ficha del producto.</div>
           )}
