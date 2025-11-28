@@ -30,7 +30,7 @@ export const dietSchema = z.object({
 });
 
 export function useOnboardingForm<T extends Record<string, any>>(
-  step: StepKey,
+  step: number,
   schema: AnyZodObject,
   onSubmitCallback?: (values: T) => void
 ) {
@@ -57,7 +57,7 @@ export function useOnboardingForm<T extends Record<string, any>>(
   });
 
   const onSubmit: SubmitHandler<T> = (values) => {
-    const actionName = stepActions[step];
+    const actionName = stepActions[step as keyof typeof stepActions];
 
     // Ejecutamos el setter correspondiente en el store.
     // Hacemos cast a any aquí porque los setters del store aceptan tipos concretos (BiometricsData, GoalData, DietData)
