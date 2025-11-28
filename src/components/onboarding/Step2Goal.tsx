@@ -11,25 +11,28 @@ import { Input } from '@/components/ui/Input';
 import { GoalSchema } from '@/lib/validations/onboarding';
 import { useOnboardingStore } from '@/store/onboarding';
 
+// CORRECCIÓN: Alineamos los tipos de datos con los que el error de TypeScript sugiere (minúsculas)
+// y los que probablemente espera la interfaz GoalData del store.
 type GoalFormData = {
-  activityLevel: 'SEDENTARY' | 'LIGHTLY_ACTIVE' | 'MODERATELY_ACTIVE' | 'VERY_ACTIVE' | 'EXTREMELY_ACTIVE';
-  goal: 'LOSE_WEIGHT' | 'MAINTAIN' | 'GAIN_MUSCLE';
+  activityLevel: 'sedentary' | 'light' | 'moderate' | 'very_active' | 'extra_active';
+  goal: 'lose_weight' | 'maintain' | 'gain_muscle';
   targetWeightKg: number;
   weeklyGoalKg: number;
 };
 
+// Los valores (value) en las opciones deben ser minúsculas para coincidir con GoalFormData
 const activityOptions = [
-    { value: 'SEDENTARY', label: 'Sedentario (poco o ningún ejercicio)' },
-    { value: 'LIGHTLY_ACTIVE', label: 'Actividad ligera (1-3 días a la semana)' },
-    { value: 'MODERATELY_ACTIVE', label: 'Actividad moderada (3-5 días a la semana)' },
-    { value: 'VERY_ACTIVE', label: 'Actividad alta (6-7 días a la semana)' },
-    { value: 'EXTREMELY_ACTIVE', label: 'Actividad extrema (2x al día)' },
+    { value: 'sedentary' as const, label: 'Sedentario (poco o ningún ejercicio)' },
+    { value: 'light' as const, label: 'Actividad ligera (1-3 días a la semana)' },
+    { value: 'moderate' as const, label: 'Actividad moderada (3-5 días a la semana)' },
+    { value: 'very_active' as const, label: 'Actividad alta (6-7 días a la semana)' },
+    { value: 'extra_active' as const, label: 'Actividad extrema (2x al día)' },
 ];
 
 const goalOptions = [
-    { value: 'LOSE_WEIGHT', label: 'Perder Peso (Déficit Calórico)' },
-    { value: 'MAINTAIN', label: 'Mantener Peso (Mantenimiento)' },
-    { value: 'GAIN_MUSCLE', label: 'Ganar Músculo (Superávit Calórico)' },
+    { value: 'lose_weight' as const, label: 'Perder Peso (Déficit Calórico)' },
+    { value: 'maintain' as const, label: 'Mantener Peso (Mantenimiento)' },
+    { value: 'gain_muscle' as const, label: 'Ganar Músculo (Superávit Calórico)' },
 ];
 
 const Step2Goal: React.FC = () => {
@@ -40,8 +43,9 @@ const Step2Goal: React.FC = () => {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<GoalFormData>({
     resolver: zodResolver(GoalSchema),
     defaultValues: {
-      activityLevel: onboardingData.activityLevel || 'MODERATELY_ACTIVE',
-      goal: onboardingData.goal || 'MAINTAIN',
+      // Aseguramos que los valores por defecto se alinean con los tipos GoalFormData
+      activityLevel: (onboardingData.activityLevel as GoalFormData['activityLevel']) || 'moderate',
+      goal: (onboardingData.goal as GoalFormData['goal']) || 'maintain',
       // Usa el peso actual como fallback o base
       targetWeightKg: onboardingData.targetWeightKg || onboardingData.weightKg || 75, 
       weeklyGoalKg: onboardingData.weeklyGoalKg || 0.5,
