@@ -13,7 +13,7 @@ const IMCCalculator = () => {
         return null; // No mostrar si faltan datos
     }
 
-    const imcResult = calculateIMC(data.heightCm, data.weightKg);
+    const imc = calculateIMC(data.heightCm, data.weightKg);
 
     const getStatus = (imc: number) => {
         if (imc < 18.5) return { label: "Bajo Peso", color: "text-yellow-400" };
@@ -22,7 +22,7 @@ const IMCCalculator = () => {
         return { label: "Obesidad", color: "text-red-400" };
     };
 
-    const status = getStatus(imcResult.imc);
+    const status = getStatus(imc);
 
     return (
         <Card>
@@ -33,7 +33,7 @@ const IMCCalculator = () => {
             <CardContent>
                 <div className="flex flex-col items-center justify-center space-y-2">
                     <p className="text-5xl font-extrabold text-white">
-                        {imcResult.imc.toFixed(1)}
+                        {imc.toFixed(1)}
                     </p>
                     <p className={`text-lg font-bold ${status.color}`}>{status.label}</p>
                 </div>
@@ -41,6 +41,3 @@ const IMCCalculator = () => {
         </Card>
     );
 };
-
-export default IMCCalculator;
-        
