@@ -82,7 +82,7 @@ export default function Step5DietPage() {
                   </option>
                 ))}
               </select>
-              <FieldErrorMessage message={errors.dietType?.message} />
+              <FieldErrorMessage message={errors.dietType?.message?.toString()} />
             </div>
 
             {/* Alérgenos */}
@@ -94,7 +94,7 @@ export default function Step5DietPage() {
                 placeholder="Ej: gluten, nueces, lactosa"
                 className="w-full p-3 border rounded-lg"
               />
-              <FieldErrorMessage message={errors.allergens?.message} />
+              <FieldErrorMessage message={errors.allergens?.message?.toString()} />
             </div>
 
             {/* Restricciones */}
@@ -106,7 +106,7 @@ export default function Step5DietPage() {
                 placeholder="Ej: carne roja, azúcar refinada, cebolla"
                 className="w-full p-3 border rounded-lg"
               />
-              <FieldErrorMessage message={errors.restrictions?.message} />
+              <FieldErrorMessage message={errors.restrictions?.message?.toString()} />
             </div>
 
             <StepButtons
