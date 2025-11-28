@@ -4,26 +4,39 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { useOnboardingStore } from '@/store/onboarding';
+// 1. CORRECCIÓN: Debes importar las funciones de cálculo. 
+// Asumiré que están en una carpeta de utilidades. Si no las tienes, ver abajo.
+import { calculateGoalCalories, calculateMaintenanceMacros } from '@/lib/calculators'; 
+
+// 2. CORRECCIÓN: Definir interfaz para las props del sub-componente
+interface MacroItemProps {
+    label: string;
+    grams: number;
+    percentage: number;
+}
 
 export const MacrosCalculator = () => {
     const { data } = useOnboardingStore();
     
-    if (!data.goal || !data.weeklyTarget || !data.heightCm) {
+    // Nota: Asegúrate de que 'weeklyTarget' exista en tu store (ver paso extra abajo)
+    if (!data.goal || !data.weight || !data.heightCm) {
         return <p className="text-slate-400">Faltan datos para calcular los macros.</p>;
     }
 
+    // Nota: Añadí validación para evitar errores si las funciones retornan null o undefined
     const goalCalories = calculateGoalCalories({
-        tdee: 2000, // Debería obtenerse del TDEECalculator o de un cálculo completo
+        tdee: 2000, 
         goal: data.goal,
-        weeklyTarget: data.weeklyTarget,
+        weeklyTarget: data.weeklyTarget || 0, // Fallback si es undefined
     });
     
     const macros = calculateMaintenanceMacros({
         calories: goalCalories.targetCalories,
-        dietType: data.dietType,
+        dietType: data.dietType || 'balanced', // Fallback por defecto
     });
 
-    const MacroItem = ({ label, grams, percentage }) => (
+    // 3. CORRECCIÓN: Añadir el tipo a las props (: MacroItemProps)
+    const MacroItem = ({ label, grams, percentage }: MacroItemProps) => (
         <div className="p-3 rounded-xl bg-slate-800 flex justify-between items-center">
             <div>
                 <p className="text-sm font-medium text-white">{label}</p>
@@ -53,4 +66,3 @@ export const MacrosCalculator = () => {
         </Card>
     );
 };
-        
