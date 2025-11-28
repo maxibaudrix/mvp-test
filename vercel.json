@@ -24,11 +24,7 @@
       ]
     }
   ],
-  
-  "functions": {
-    "api/**/*route.ts": { "maxDuration": 10 } 
-  },
-  
+   
   "rewrites": [
     {
       "source": "/api/v1/:path*",
