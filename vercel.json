@@ -24,10 +24,6 @@
       ]
     }
   ],
-  
-  "functions": {
-    "api/**": { "maxDuration": 10 }
-  },
 
   "rewrites": [
     {
