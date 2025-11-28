@@ -5,9 +5,10 @@ import { create } from 'zustand';
 import { BiometricsData, GoalData, DietData, OnboardingData } from '@/types/onboarding'; // Asumiendo que estos tipos existen
 
 interface OnboardingStore {
-  data: Partial<OnboardingData>;
+  // Solo la propiedad 'data' que contiene todos los campos
+  data: Partial<OnboardingData>; 
   step: number;
-  
+    
   // Acciones
   setBiometrics: (data: BiometricsData) => void;
   setGoal: (data: GoalData) => void;
