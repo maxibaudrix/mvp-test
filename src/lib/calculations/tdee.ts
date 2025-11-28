@@ -18,7 +18,7 @@ const ACTIVITY_MULTIPLIERS = {
  */
 const calculateRMR = (data: Omit<BiometricsData, 'dateOfBirth'>, age: number): number => {
     const { weightKg, heightCm, gender } = data;
-    const s = gender === 'MALE' ? RMR_MALE_FACTOR : RMR_FEMALE_FACTOR;
+    const s = gender === 'male' ? RMR_MALE_FACTOR : RMR_FEMALE_FACTOR;
 
     // RMR = (10 * peso_kg) + (6.25 * altura_cm) - (5 * edad) + S
     return (10 * weightKg) + (6.25 * heightCm) - (5 * age) + s;
