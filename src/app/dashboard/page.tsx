@@ -18,13 +18,28 @@ export default function DashboardPage() {
   const dailyStats = {
     consumed: 1450,
     burned: currentWorkout?.isCompleted ? (currentWorkout.durationMinutes * 8) : 0, // Est. 8 cal/min
-    target: user?.profile?.targetCalories || 2000,
+    target: user?.profile?.targetCalories || user?.goals?.targetCalories || 2000,
     macros: {
-        protein: { current: 110, target: user?.profile?.targetMacros?.protein || 150, unit: 'g' },
-        carbs: { current: 140, target: user?.profile?.targetMacros?.carbs || 200, unit: 'g' },
-        fat: { current: 45, target: user?.profile?.targetMacros?.fat || 65, unit: 'g' },
+        protein: { 
+          current: 110, 
+          target: user?.profile?.targetMacros?.protein || user?.goals?.targetMacros?.protein || 150, 
+          unit: 'g' 
+        },
+        carbs: { 
+          current: 140, 
+          target: user?.profile?.targetMacros?.carbs || user?.goals?.targetMacros?.carbs || 200, 
+          unit: 'g' 
+        },
+        fat: { 
+          current: 45, 
+          target: user?.profile?.targetMacros?.fat || user?.goals?.targetMacros?.fat || 65, 
+          unit: 'g' 
+        },
     }
   };
+
+  // Obtener el nombre del usuario
+  const userName = user?.profile?.firstName || user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Atleta';
 
   return (
     <AppShell title="Dashboard">
@@ -33,7 +48,7 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
-                Hola, {user?.firstName || 'Atleta'} 👋
+                Hola, {userName} 👋
             </h1>
             <p className="text-gray-500">Aquí está tu resumen de hoy.</p>
         </div>
