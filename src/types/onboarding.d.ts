@@ -4,29 +4,29 @@
 
 // Paso 1: Biometría
 export interface BiometricsData {
-  gender: 'male' | 'female' | 'other';
-  dateOfBirth: string;
-  heightCm: number;
-  weightKg: number;
-  age: number; // Asumo que la edad se calcula en el front-end y se guarda aquí.
-  heightCm: number;
-  weightKg: number;
+    gender: 'male' | 'female' | 'other';
+    dateOfBirth: string;
+    // Propiedades corregidas y sin duplicar
+    heightCm: number;
+    weightKg: number;
+    age: number; // Asumo que la edad se calcula en el front-end y se guarda aquí.
 }
 
 // Paso 2: Objetivos y Actividad
 export interface GoalData {
-  activityLevel: 'sedentary' | 'light' | 'moderate' | 'very_active' | 'extra_active';
-  goal: 'lose_weight' | 'maintain' | 'gain_muscle';
-  targetWeightKg: number;
-  weeklyGoalKg: number;
+    activityLevel: 'sedentary' | 'light' | 'moderate' | 'very_active' | 'extra_active';
+    // Se mantiene la nomenclatura en minúsculas para coincidir con `FitnessGoal` en calculations.ts
+    goal: 'lose_weight' | 'maintain' | 'gain_muscle';
+    targetWeightKg: number;
+    weeklyGoalKg: number;
 }
 
 // Paso 3: Preferencias Dietéticas
 export interface DietData {
-  dietType: string; // omnivore, vegetarian, vegan, keto, paleo
-  // Usamos arrays para el manejo de formularios, el backend lo convertirá a cadena
-  allergies: string[]; 
-  excludedIngredients: string[]; 
+    dietType: string; // omnivore, vegetarian, vegan, keto, paleo
+    // Usamos arrays para el manejo de formularios, el backend lo convertirá a cadena
+    allergies: string[]; 
+    excludedIngredients: string[]; 
 }
 
 /**
