@@ -20,10 +20,12 @@ export const lifestyleSchema = z.object({
   weeklyTarget: z.number().min(0.25, 'Mínimo 0.25 kg').max(1.5, 'Máximo 1.5 kg'),
 });
 
+// Assuming this is in useOnboardingForm.ts
 export const dietSchema = z.object({
-    dietType: z.enum(['NONE', 'VEGETARIAN', 'VEGAN', 'PALEO', 'KETO']),
-    allergens: z.string().optional(),
-    restrictions: z.string().optional(),
+  dietType: z.enum(['NONE', 'VEGETARIAN', 'VEGAN', 'PALEO', 'KETO']),
+  // These keys MUST match the form fields:
+  allergens: z.string().optional(),
+  restrictions: z.string().optional(),
 });
 
 // Tipos de formularios

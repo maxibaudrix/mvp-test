@@ -1,4 +1,3 @@
-// src/lib/validations/onboarding.ts
 // Esquemas de validación Zod para el proceso de Onboarding
 import { z } from 'zod';
 
@@ -18,7 +17,7 @@ const FitnessGoalLiterals = Object.values(GOALS);
 
 export const BiometricsSchema = z.object({
     // Mantenemos la convención de minúsculas para consistencia con el formulario,
-    // asumiendo que el componente Biometrics (Step 1) usa 'male', 'female', etc.
+    // asumiendo que el componente Biometrics (Step 1) usa 'male', 'female', etc.
     gender: z.enum(['male', 'female', 'other'], { 
         required_error: 'El género es requerido.',
     }),
@@ -34,11 +33,11 @@ export const BiometricsSchema = z.object({
 });
 
 export const GoalSchema = z.object({
-    // Usamos los literales importados que están en minúsculas
+    // Usamos los literales importados que están en minúsculas
     activityLevel: z.enum(ActivityLevelLiterals as [ActivityLevelForm, ...ActivityLevelForm[]], {
         required_error: 'El nivel de actividad es requerido.',
     }),
-    // Usamos los literales importados que están en minúsculas
+    // Usamos los literales importados que están en minúsculas
     goal: z.enum(FitnessGoalLiterals as [GoalForm, ...GoalForm[]], {
         required_error: 'El objetivo es requerido.',
     }),
@@ -46,12 +45,15 @@ export const GoalSchema = z.object({
     weeklyGoalKg: z.number().min(-1.5, 'Meta semanal mínima: -1.5 kg.').max(1, 'Meta semanal máxima: 1 kg.'),
 });
 
-// --- Esquemas Faltantes (Añadidos) ---
-
 export const DietSchema = z.object({
-    dietType: z.string().min(1, 'El tipo de dieta es requerido.'),
-    allergies: z.array(z.string()).optional(),
-    excludedIngredients: z.array(z.string()).optional(),
+    // dietType puede ser un enum o string, dependiendo de tu implementación del componente Select
+    dietType: z.enum(['NONE', 'VEGETARIAN', 'VEGAN', 'PALEO', 'KETO'], {
+        required_error: 'El tipo de dieta es requerido.',
+    }),
+    // ¡CORRECCIÓN! Usamos 'allergens' y 'restrictions' para coincidir con el formulario
+    // Y validamos como 'string' ya que el input devuelve una cadena, no un array.
+    allergens: z.string().optional(),
+    restrictions: z.string().optional(),
 });
 
 /**
