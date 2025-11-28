@@ -41,3 +41,4 @@ const IMCCalculator = () => {
         </Card>
     );
 };
+export default IMCCalculator;
