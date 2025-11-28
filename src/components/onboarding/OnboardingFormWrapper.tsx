@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Progress } from '@/components/ui/progress'; 
+import { Progress } from '@/components/ui/Progress'; 
 import { Button } from '@/components/ui/button';
 import { useOnboardingStore } from '@/store/onboarding';
 

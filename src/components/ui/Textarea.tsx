@@ -1,0 +1,12 @@
+import * as React from "react";
+
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+
+export default function Textarea(props: TextareaProps) {
+  return (
+    <textarea
+      className="w-full rounded-md border border-gray-300 p-2"
+      {...props}
+    />
+  );
+}

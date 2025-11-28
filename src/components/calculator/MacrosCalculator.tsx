@@ -4,7 +4,6 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { useOnboardingStore } from '@/store/onboarding';
-import { calculateMaintenanceMacros, calculateGoalCalories } from '@/lib/calculations'; // Asumimos estas funciones existen en Fase 5
 
 export const MacrosCalculator = () => {
     const { data } = useOnboardingStore();
