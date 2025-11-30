@@ -267,3 +267,29 @@ model Recipe {
 
   @@index([userId, createdAt])
 }
+
+// NOTA: Se asume que los modelos `User` y `ScannedProduct` ya existen.
+
+model DiaryMeal {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  date        DateTime // Fecha en la que se consume la comida (solo la fecha, la hora está en createdAt)
+  mealType    String   // breakfast, lunch, dinner, snacks
+  productId   String
+  product     ScannedProduct @relation(fields: [productId], references: [id])
+  servingSize Float    // gramos
+  createdAt   DateTime @default(now()) // Hora exacta de registro
+
+  @@index([userId, date])
+}
+
+model DailyWater {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @unique // Único por usuario y fecha
+  glasses   Int      @default(0)
+
+  @@index([userId, date])
+}
