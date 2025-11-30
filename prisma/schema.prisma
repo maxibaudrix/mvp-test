@@ -242,6 +242,43 @@ model ProgressTracking {
 
   @@index([userId, date])
 }
+model WeightEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @unique // Único por usuario y fecha
+  weight    Float
+  bodyFat   Float?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, date]) // Usar unique constraint compuesta para mayor seguridad
+}
+
+model BodyMeasurement {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime // Puede haber múltiples mediciones en un día si se quisiera, pero se indexa por fecha
+  waistCm   Float?
+  chestCm   Float?
+  hipsCm    Float?
+  armsCm    Float?
+  createdAt DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model ProgressPhoto {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime
+  type      String   // front, side, back
+  imageUrl  String
+  createdAt DateTime @default(now())
+
+  @@index([userId, date, type])
+}
 
 // ============================================
 // RECIPES
