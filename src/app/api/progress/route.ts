@@ -1,7 +1,7 @@
 // src/app/api/progress/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { progressQuerySchema } from '@/lib/validations/progress';
-import prisma from '@/lib/prisma'; // Tu instancia de Prisma
+import prisma from Schema.p; // Tu instancia de Prisma
 import { calculateIMC } from '@/lib/calculations/imc'; // Tu función de cálculo de IMC
 
 // Función de MOCK para obtener la fecha de inicio del período

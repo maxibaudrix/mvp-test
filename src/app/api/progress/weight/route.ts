@@ -1,7 +1,7 @@
 // src/app/api/progress/weight/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { addWeightSchema } from '@/lib/validations/progress';
-// import prisma from '@/lib/prisma'; // Tu instancia de Prisma
+import prisma from '@/lib/prisma'; // Tu instancia de Prisma
 
 /**
  * POST /api/progress/weight
