@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { 
   ChevronLeft, TrendingUp, TrendingDown, Scale, Ruler, 
   Camera, Share2, History, Plus, Flame, Target, Zap, 
-  Rings, CheckCircle, XCircle
+  Loader2, CheckCircle, XCircle
 } from 'lucide-react';
 
 // Se asume que estos componentes existen en tu proyecto
