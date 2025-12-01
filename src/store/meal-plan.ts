@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 // --- Dependencias y Tipos ---
 // Usamos el import de generator solo para los tipos, no para la ejecución de la función aquí.
-import type { MealPlanEntry, WeeklyStats, PlanPreferences } from '@/lib/mealPlanEngine/generator'; 
+import type { MealPlanEntry, WeeklyStats, PlanPreferences, RecipeSummary } from '@/lib/mealPlanEngine/generator';
 
 // --- Funciones de Utilidad de Fecha (Para manejo de semanas dinámicas) ---
 
@@ -30,13 +30,6 @@ const navigateWeek = (current: string, direction: 'prev' | 'next'): string => {
 };
 
 // --- Tipos e Interfaz del Store ---
-
-interface RecipeSummary {
-    recipeId: string;
-    name: string;
-    macros: { protein: number; carbs: number; fats: number };
-    calories: number;
-}
 
 interface MealPlanState {
     currentWeek: string; // YYYY-WXX
@@ -134,7 +127,7 @@ export const useMealPlanStore = create<MealPlanState>((set, get) => ({
     assignRecipe: async (date, mealType, recipeId) => {
         
         try {
-            const endpoint = recipeId ? `/api/meal-plan/assign` : `/api/meal-plan/remove`;
+            const endpoint = `/api/meal-plan`; // Ambos casos van al mismo route handler
             const method = recipeId ? 'PATCH' : 'DELETE';
             const payload = recipeId 
                 ? { date, mealType, recipeId } 
