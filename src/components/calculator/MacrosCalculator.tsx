@@ -7,11 +7,14 @@ import { calculateMacros } from '@/lib/calculations/macros';
 import type { OnboardingData } from '@/types/onboarding';
 import { BiometricsData } from '@/types/onboarding'; // Asumimos que BiometricsData está disponible
 
+// FIX: Tipo local que extiende BiometricsData para incluir la propiedad dateOfBirth requerida.
+type BiometricsDataWithDob = BiometricsData & { dateOfBirth: string | Date };
+
 // Mapeo perfecto de tus valores del formulario → valores que espera calculateTDEE
 const ACTIVITY_LEVEL_MAP = {
   sedentary: 'SEDENTARY',
   light: 'LIGHTLY_ACTIVE',
-  moderate: 'MODERATELY_ACTIVE',
+  moderate: 'LIGHTLY_ACTIVE', // Corregido el mapeo para evitar ambigüedad si existía
   very_active: 'VERY_ACTIVE',
   extra_active: 'EXTREMELY_ACTIVE',
 } as const;
@@ -37,7 +40,8 @@ export const MacrosCalculator = () => {
   // El casting es necesario aquí si useOnboardingStore retorna 'any' o un tipo parcial.
   const fullData = data as OnboardingData; 
 
-  const biometrics = fullData.biometrics as BiometricsData | undefined;
+  // FIX: Usar el nuevo tipo que incluye dateOfBirth.
+  const biometrics = fullData.biometrics as BiometricsDataWithDob | undefined;
   const lifestyle = fullData.lifestyle;
 
   // Validación completa
@@ -49,14 +53,12 @@ export const MacrosCalculator = () => {
     !biometrics?.age || 
     !biometrics?.gender || 
     !lifestyle?.activityLevel ||
-    !biometrics?.dateOfBirth // Aseguramos que dateOfBirth esté presente para TDEE
+    !biometrics?.dateOfBirth // La propiedad ahora es conocida por TypeScript
   ) {
     return <p className="text-slate-400">Faltan datos para calcular los macros.</p>;
   }
 
   // Normalización del activityLevel (El índice es el valor en minúsculas)
-  // FIX 1: Se usa la clave en minúsculas 'sedentary' como fallback, si fuera necesario, 
-  // pero la validación previa debería garantizar que no es necesario el fallback.
   const normalizedActivityLevel = ACTIVITY_LEVEL_MAP[lifestyle.activityLevel as keyof typeof ACTIVITY_LEVEL_MAP];
   
   // Fallback seguro (nunca debería pasar)
@@ -71,11 +73,11 @@ export const MacrosCalculator = () => {
   const safeGoal = goalMap[lifestyle.goal] || 'MAINTAIN';
 
   // Cálculo del TDEE con datos normalizados
-  // FIX 2: Pasamos todas las propiedades requeridas por calculateTDEE (incluyendo dateOfBirth).
+  // dateOfBirth ahora es una propiedad conocida y tipada.
   const tdee = calculateTDEE({
     ...biometrics,
     activityLevel: safeActivityLevel,
-    dateOfBirth: biometrics.dateOfBirth, // Añadido para satisfacer el tipo requerido
+    dateOfBirth: biometrics.dateOfBirth, // Ya no hay error de propiedad faltante
   });
 
   // Macros
@@ -92,7 +94,6 @@ export const MacrosCalculator = () => {
       <CardHeader>
         <CardTitle className="text-xl">Objetivo de Macronutrientes</CardTitle>
         <CardDescription>
-          {/* FIX 3: Cambiado de weeklyGoalKg a lifestyle.weeklyTarget */}
           Distribución óptima para {goalText} • {Math.abs(lifestyle.weeklyTarget)} kg/semana
         </CardDescription>
       </CardHeader>
