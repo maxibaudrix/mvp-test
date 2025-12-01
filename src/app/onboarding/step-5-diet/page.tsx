@@ -8,6 +8,7 @@ import StepButtons from '@/components/onboarding/StepButtons';
 import { useOnboardingForm, dietSchema } from '@/hooks/useOnboardingForm';
 import { Label } from '@/components/ui/Label';
 import { Select } from '@/components/ui/Select';
+import { useOnboardingStore } from '@/store/onboarding';
 
 const NEXT_PATH = '/onboarding/step-6-summary';
 const PREV_PATH = '/onboarding/step-4-training-level';
@@ -42,6 +43,7 @@ const EXCLUDED_INGREDIENTS = [
 
 export default function Step5DietPage() {
   const router = useRouter();
+  const { setDiet } = useOnboardingStore();   
 
   const {
     register,
@@ -49,17 +51,31 @@ export default function Step5DietPage() {
     formState: { errors, isSubmitting },
     watch,
     setValue,
-  } = useOnboardingForm(5, dietSchema, () => {
+  } = useOnboardingForm(5, dietSchema, (formData) => {
+    // ✅ Callback actualizado — guarda preferencias dietéticas en Zustand
+    setDiet({
+      dietType: formData.dietType,
+      allergies: formData.allergies,
+      excludedIngredients: formData.excludedIngredients,
+    });
+
     router.push(NEXT_PATH);
   });
 
   const allergies = watch('allergies') || [];
   const excludedIngredients = watch('excludedIngredients') || [];
 
-  const toggleItem = (field: 'allergies' | 'excludedIngredients', item: string) => {
+  const toggleItem = (
+    field: 'allergies' | 'excludedIngredients',
+    item: string
+  ) => {
     const current = field === 'allergies' ? allergies : excludedIngredients;
+
     if (current.includes(item)) {
-      setValue(field, current.filter((i: string) => i !== item));
+      setValue(
+        field,
+        current.filter((i: string) => i !== item)
+      );
     } else {
       setValue(field, [...current, item]);
     }
@@ -78,6 +94,7 @@ export default function Step5DietPage() {
           
           <CardContent>
             <form onSubmit={handleSubmitStore} className="space-y-6">
+
               {/* Tipo de Dieta */}
               <div>
                 <Label htmlFor="dietType" className="mb-2 block">
@@ -91,6 +108,7 @@ export default function Step5DietPage() {
                     </option>
                   ))}
                 </Select>
+
                 {errors.dietType && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.dietType.message?.toString()}
@@ -98,12 +116,13 @@ export default function Step5DietPage() {
                 )}
               </div>
 
-              {/* Alergias Comunes */}
+              {/* Alergias */}
               <div>
                 <Label className="mb-3 block">
                   Alergias e Intolerancias
                   <span className="text-slate-500 text-xs ml-2">(Opcional)</span>
                 </Label>
+
                 <div className="grid grid-cols-2 gap-3">
                   {COMMON_ALLERGIES.map(allergy => (
                     <Label
@@ -120,17 +139,21 @@ export default function Step5DietPage() {
                         onChange={() => toggleItem('allergies', allergy)}
                         className="sr-only"
                       />
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                        allergies.includes(allergy)
-                          ? 'bg-red-500 border-red-500'
-                          : 'border-slate-600'
-                      }`}>
+
+                      <div
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                          allergies.includes(allergy)
+                            ? 'bg-red-500 border-red-500'
+                            : 'border-slate-600'
+                        }`}
+                      >
                         {allergies.includes(allergy) && (
                           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
                           </svg>
                         )}
                       </div>
+
                       <span className="text-sm font-medium">{allergy}</span>
                     </Label>
                   ))}
@@ -143,6 +166,7 @@ export default function Step5DietPage() {
                   Ingredientes que Prefieres Evitar
                   <span className="text-slate-500 text-xs ml-2">(Opcional)</span>
                 </Label>
+
                 <div className="grid grid-cols-2 gap-3">
                   {EXCLUDED_INGREDIENTS.map(ingredient => (
                     <Label
@@ -159,24 +183,28 @@ export default function Step5DietPage() {
                         onChange={() => toggleItem('excludedIngredients', ingredient)}
                         className="sr-only"
                       />
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                        excludedIngredients.includes(ingredient)
-                          ? 'bg-yellow-500 border-yellow-500'
-                          : 'border-slate-600'
-                      }`}>
+
+                      <div
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                          excludedIngredients.includes(ingredient)
+                            ? 'bg-yellow-500 border-yellow-500'
+                            : 'border-slate-600'
+                        }`}
+                      >
                         {excludedIngredients.includes(ingredient) && (
                           <svg className="w-3 h-3 text-slate-950" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
                           </svg>
                         )}
                       </div>
+
                       <span className="text-sm font-medium">{ingredient}</span>
                     </Label>
                   ))}
                 </div>
               </div>
 
-              {/* Info Box */}
+              {/* Nota Informativa */}
               <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                 <p className="text-sm text-blue-300">
                   💡 <strong>Nota:</strong> Estas preferencias se usarán para filtrar productos en el scanner y generar recetas personalizadas.
