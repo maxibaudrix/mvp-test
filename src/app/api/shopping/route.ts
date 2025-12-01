@@ -151,11 +151,3 @@ export async function PATCH_ITEM(req: NextRequest, { params }: { params: { id: s
         return NextResponse.json({ error: "Failed to update item status" }, { status: 500 });
     }
 }
-
-// Para usar las rutas como Next.js espera, combinamos los handlers.
-export { 
-    GET, 
-    // Usamos POST para la generación, y POST_ADD para la adición manual (idealmente en un path separado)
-    POST_ADD as POST,
-    PATCH_ITEM as PATCH // Next.js no permite PATCH con ruta dinámica en la función principal
-};
