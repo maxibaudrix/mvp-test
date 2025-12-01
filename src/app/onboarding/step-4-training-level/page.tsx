@@ -1,4 +1,3 @@
-
 // src/app/onboarding/step-4-training-level/page.tsx
 'use client';
 
@@ -10,7 +9,7 @@ import { useOnboardingForm, lifestyleSchema } from '@/hooks/useOnboardingForm';
 import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
 import { AlertCircle } from 'lucide-react';
-
+import { useOnboardingStore } from '@/store/onboarding';  
 
 const NEXT_PATH = '/onboarding/step-5-diet';
 const PREV_PATH = '/onboarding/step-3-lifestyle';
@@ -26,17 +25,25 @@ const ActivityOptions = [
 export default function Step4TrainingLevelPage() {
   const router = useRouter();
 
-const FieldErrorMessage = ({ message }: { message?: string }) => {
-  if (!message) return null;
-  return <p className="text-red-500 text-xs mt-1">{message}</p>;
-};
+  const { setLifestyle } = useOnboardingStore();   
+
+  const FieldErrorMessage = ({ message }: { message?: string }) => {
+    if (!message) return null;
+    return <p className="text-red-500 text-xs mt-1">{message}</p>;
+  };
 
   const {
     register,
     handleSubmitStore,
     formState: { errors, isSubmitting },
     watch,
-  } = useOnboardingForm(4, lifestyleSchema, () => {
+  } = useOnboardingForm(4, lifestyleSchema, (formData) => {
+    // ✅ NUEVO CALLBACK — guarda en Zustand
+    setLifestyle({
+      activityLevel: formData.activityLevel,
+      goal: formData.goal,
+      weeklyTarget: formData.weeklyTarget,
+    });
     router.push(NEXT_PATH);
   });
 
@@ -50,8 +57,10 @@ const FieldErrorMessage = ({ message }: { message?: string }) => {
         title="Tu Estilo de Vida y Objetivos"
         description="Dinos qué tan activo eres y cuál es tu meta principal."
       />
+
       <CardContent>
         <form onSubmit={handleSubmitStore} className="space-y-6">
+
           {/* Nivel de Actividad */}
           <div>
             <Label htmlFor="activityLevel" className="mb-2 block">Nivel de Actividad Física</Label>
@@ -62,7 +71,9 @@ const FieldErrorMessage = ({ message }: { message?: string }) => {
             >
               <option value="">Selecciona tu nivel</option>
               {ActivityOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
             <FieldErrorMessage message={errors.activityLevel?.message?.toString()} />
@@ -89,7 +100,11 @@ const FieldErrorMessage = ({ message }: { message?: string }) => {
                     {...register('goal')}
                     className="sr-only"
                   />
-                  {g === 'MAINTAIN' ? 'Mantener Peso' : g === 'LOSE' ? 'Perder Peso' : 'Ganar Músculo'}
+                  {g === 'MAINTAIN'
+                    ? 'Mantener Peso'
+                    : g === 'LOSE'
+                    ? 'Perder Peso'
+                    : 'Ganar Músculo'}
                 </Label>
               ))}
             </div>
@@ -110,10 +125,12 @@ const FieldErrorMessage = ({ message }: { message?: string }) => {
                 {...register('weeklyTarget', { valueAsNumber: true })}
                 className="mt-1 block w-full"
               />
+
               <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3 text-yellow-500" />
                 Recomendado entre 0.25 kg y 1.5 kg por semana.
               </p>
+
               <FieldErrorMessage message={errors.weeklyTarget?.message?.toString()} />
             </div>
           )}
@@ -123,7 +140,7 @@ const FieldErrorMessage = ({ message }: { message?: string }) => {
             nextPath={NEXT_PATH}
             prevPath={PREV_PATH}
             isSubmitting={isSubmitting}
-            onNext={() => {}} // La acción de navegación está en el handleSubmit
+            onNext={() => {}} // La navegación ocurre dentro de handleSubmit
             isLastStep={false}
           />
         </form>
@@ -131,4 +148,3 @@ const FieldErrorMessage = ({ message }: { message?: string }) => {
     </Card>
   );
 }
-        
