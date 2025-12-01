@@ -5,6 +5,7 @@ import {
   ChefHat, CheckCircle2, ShoppingCart, Plus, 
   Minus, PlayCircle
 } from 'lucide-react';
+import { number } from 'zod';
 
 export default function RecipePreview() {
   const [servings, setServings] = useState(1);
@@ -29,9 +30,9 @@ export default function RecipePreview() {
     ]
   };
 
-  const toggleIngredient = (id) => setCheckedIngredients(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  const toggleStep = (id) => setCompletedSteps(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-  const adjustServings = (d) => setServings(prev => Math.max(1, prev + d));
+  const toggleIngredient = (id: number) => setCheckedIngredients(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  const toggleStep = (id: number) => setCompletedSteps(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  const adjustServings = (d: number) => setServings(prev => Math.max(1, prev + d));
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans pb-24">
