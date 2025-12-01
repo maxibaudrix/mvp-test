@@ -9,8 +9,8 @@ import { number } from 'zod';
 
 export default function RecipePreview() {
   const [servings, setServings] = useState(1);
-  const [checkedIngredients, setCheckedIngredients] = useState([]);
-  const [completedSteps, setCompletedSteps] = useState([]);
+  const [checkedIngredients, setCheckedIngredients] = useState<number[]>([]);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [isFavorite, setIsFavorite] = useState(false);
 
   const recipe = {
