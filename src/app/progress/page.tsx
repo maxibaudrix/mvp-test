@@ -1,4 +1,5 @@
 // src/app/progress/page.tsx
+'use client';
 import React, { useState } from 'react';
 import { 
   ChevronLeft, TrendingUp, TrendingDown, Scale, Ruler, 

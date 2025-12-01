@@ -1,4 +1,5 @@
 // src/app/meal-planner/page.tsx
+'use client';
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Zap, ShoppingCart, Heart, RefreshCw, Plus, Loader2 } from 'lucide-react';
 import { useMealPlanStore } from '@/store/meal-plan';

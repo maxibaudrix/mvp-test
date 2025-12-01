@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useShoppingStore, ShoppingItem, Category } from '@/store/shopping'; // Corregida la ruta de importación
 import { Share2, Search, Zap, CheckCircle2, ShoppingCart, Loader2, RefreshCw } from 'lucide-react';

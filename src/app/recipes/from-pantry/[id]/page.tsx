@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { 
   Clock, Flame, Users, ChevronLeft, Heart, Share2, 
