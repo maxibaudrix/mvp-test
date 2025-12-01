@@ -13,11 +13,6 @@ export type DietType = 'Omnívora' | 'Vegetariana' | 'Vegana' | 'Cetogénica';
 export type NovaLevel = 1 | 2 | 3 | 4;
 export type NutriScore = 'A' | 'B' | 'C' | 'D' | 'E';
 
-// src/app/settings/page.tsx
-
-// ... (línea 11, o donde termina la lista de tipos base)
-export type NutriScore = 'A' | 'B' | 'C' | 'D' | 'E';
-
 // --- INTERFACES LOCALES PARA EL ESTADO ---
 
 interface LocalProfile {
@@ -110,23 +105,25 @@ const ProfileSection: React.FC = () => {
   // Simulación de estado de carga para las peticiones de guardado
   const [isLoading, setIsLoading] = useState(false);
   const [localProfile, setLocalProfile] = useState<LocalProfile>({
-    name: user?.profile?.name || '', // El error 2339 sugiere que 'name' es parte del mock, pero no de UserProfile. Si UserProfile usa 'firstName' y 'lastName', deberás concatenarlos aquí o usar 'name' si existe en tu modelo. Asumamos que existe, o que 'name' mapea a 'firstName'. Si tu modelo UserProfile usa `firstName` en lugar de `name`, debes cambiar la línea 118 a `firstName`.
-    email: user?.email || '',
-    birthdate: user?.profile?.birthdate || '', // Asumiendo que birthdate existe en UserProfile
-    profileImageUrl: user?.profile?.profileImageUrl || 'https://placehold.co/100x100/3b82f6/ffffff?text=U',
+  // Corregido: 'name' está en la raíz del objeto user, no en profile.
+  name: user?.name || '', 
+  email: user?.email || '',
+  // Corregido: Usar 'dateOfBirth' (tipo servidor) en lugar de 'birthdate' (tipo local).
+  birthdate: user?.profile?.dateOfBirth || '', 
+  // Corregido: Asumiendo que la imagen de perfil viene de user.image (modelo Prisma User).
+  profileImageUrl: user?.image || 'https://placehold.co/100x100/3b82f6/ffffff?text=U',
   });
 
   useEffect(() => {
-    if (user?.profile) {
-        // Mapear el UserProfile completo a LocalProfile
-        setLocalProfile({
-            name: user.profile.name || '',
-            email: user.email || '',
-            birthdate: user.profile.birthdate || '',
-            profileImageUrl: user.profile.profileImageUrl || 'https://placehold.co/100x100/3b82f6/ffffff?text=U',
-        });
-    }
-  }, [user?.profile, user?.email]);
+  if (user) {
+    setLocalProfile({
+      name: user.name || '',
+      email: user.email || '',
+      birthdate: user.profile?.dateOfBirth || '', // Corregido: Usar dateOfBirth
+      profileImageUrl: user.image || 'https://placehold.co/100x100/3b82f6/ffffff?text=U', // Corregido: Usar user.image
+    });
+  }
+  }, [user]);
   
   const handleSave = async () => {
     if (!user) return;
@@ -194,11 +191,20 @@ const GoalsSection: React.FC = () => {
   
   // Tipos para el estado goals (ajustar según tu tipo AuthenticatedUser['goals'])
   const initialGoals: LocalGoals = {
-  currentGoal: user?.goals?.currentGoal || 'Mantenimiento' as GoalType,
-  targetWeightKg: user?.goals?.targetWeightKg || 70,
-  speed: user?.goals?.speed || 'Moderada',
-  // Mapea targetMacros a calculatedMacros si es necesario, o úsalos directamente
-  calculatedMacros: user?.goals?.calculatedMacros || { protein: 0, carbs: 0, fats: 0 }
+  // Corregido: Mapear a la propiedad del servidor: goalType
+  currentGoal: (user?.goals?.goalType as GoalType) || 'Mantenimiento',
+  // Corregido: Usar 'targetWeight' del servidor/Prisma
+  targetWeightKg: user?.goals?.targetWeight || 70,
+  // Corregido: Usar 'goalSpeed' del servidor/Prisma
+  speed: (user?.goals?.goalSpeed as 'Lenta' | 'Moderada' | 'Rápida') || 'Moderada',
+  // Corregido: Mapear 'fat' (servidor) a 'fats' (local)
+  calculatedMacros: user?.goals?.targetMacros
+    ? { 
+        protein: user.goals.targetMacros.protein, 
+        carbs: user.goals.targetMacros.carbs, 
+        fats: user.goals.targetMacros.fat // targetMacros.fat -> calculatedMacros.fats
+      }
+    : { protein: 0, carbs: 0, fats: 0 },
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -219,7 +225,7 @@ const GoalsSection: React.FC = () => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 500)); 
-      setGoalsData(localGoals);
+      setGoalsData(localGoals as unknown as UserGoals); 
       console.log('Goals saved:', localGoals);
     } catch (error) {
       console.error('Error saving goals:', error);
@@ -331,13 +337,19 @@ const DietSection: React.FC = () => {
 
   const handleAllergyChange = (allergy: string) => {
     const isPresent = localDiet.allergies.includes(allergy);
-    setLocalDiet((prev: LocalDiet) => ({
-      ...prev,
-      allergies: isPresent 
-        ? prev.allergies.filter(a => a !== allergy)
-        : [...prev.allergies, allergy]
-    }));
-  };
+    setLocalDiet((prev) => {
+        // Corregido: Casting del parámetro 'prev' a LocalDiet (error 2345)
+        const prevLocal = prev as LocalDiet; 
+        const isAllergySelected = prevLocal.allergies.includes(allergy);
+
+        return {
+            ...prevLocal, 
+            // Corregido: Asegurar que el array se inicializa si es null
+            allergies: isAllergySelected
+                ? prevLocal.allergies.filter(a => a !== allergy) 
+                : [...prevLocal.allergies, allergy]
+        };
+    });
   
   const handleSave = async () => {
     if (!user) return;
@@ -361,7 +373,7 @@ const DietSection: React.FC = () => {
     <div className="space-y-6">
       <Select
         label="Tipo de dieta"
-        value={localDiet.dietType}
+        value={localDiet.dietType || ''}
         options={dietOptions}
         onChange={(e) => setLocalDiet({ ...localDiet, dietType: e.target.value as DietType })}
       />
@@ -374,7 +386,7 @@ const DietSection: React.FC = () => {
               key={allergy}
               onClick={() => handleAllergyChange(allergy)}
               className={`px-4 py-2 text-sm font-semibold rounded-full border transition-colors ${
-                localDiet.allergies.includes(allergy)
+                localDiet.allergies && localDiet.allergies.includes(allergy)
                   ? 'bg-red-500 text-white border-red-500'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
@@ -394,7 +406,7 @@ const DietSection: React.FC = () => {
 
       <Select
         label="Nutri-Score mínimo aceptado"
-        value={localDiet.minNutriScore}
+        value={localDiet.minNutriScore || ''}
         options={nutriScoreOptions}
         onChange={(e) => setLocalDiet({ ...localDiet, minNutriScore: e.target.value as NutriScore })}
       />
@@ -453,7 +465,7 @@ const ActivitySection: React.FC = () => {
     <div className="space-y-6">
       <Select
         label="Nivel de actividad"
-        value={localActivity.activityLevel}
+        value={localActivity.activityLevel || ''}
         options={levelOptions}
         onChange={(e) => setLocalActivity({ ...localActivity, activityLevel: e.target.value as ActivityLevel })}
       />
@@ -462,17 +474,23 @@ const ActivitySection: React.FC = () => {
         <label className="text-sm font-medium text-gray-700 block mb-1">Días de entreno/semana</label>
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => setLocalActivity((prev: LocalActivity) => ({ ...prev, trainingDaysPerWeek: Math.max(0, prev.trainingDaysPerWeek - 1) }))}
+            onClick={() => setLocalActivity((prev) => ({ 
+              ...prev as LocalActivity, // Corregido: Casting
+              trainingDaysPerWeek: Math.max(0, (prev as LocalActivity).trainingDaysPerWeek - 1) 
+            }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-            disabled={localActivity.trainingDaysPerWeek <= 0}
+            disabled={(localActivity.trainingDaysPerWeek ?? 0) <= 0}
           >
             <Minus className="w-5 h-5 text-gray-700" />
           </button>
           <span className="text-xl font-bold w-10 text-center">{localActivity.trainingDaysPerWeek}</span>
-          <button
-            onClick={() => setLocalActivity((prev: LocalActivity) => ({ ...prev, trainingDaysPerWeek: Math.min(7, prev.trainingDaysPerWeek + 1) }))}
+          <button 
+            onClick={() => setLocalActivity((prev) => ({ 
+              ...prev as LocalActivity, // Corregido: Casting
+              trainingDaysPerWeek: Math.min(7, (prev as LocalActivity).trainingDaysPerWeek + 1) 
+            }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-            disabled={localActivity.trainingDaysPerWeek >= 7}
+            disabled={(localActivity.trainingDaysPerWeek ?? 0) >= 7}
           >
             <Plus className="w-5 h-5 text-gray-700" />
           </button>
@@ -481,7 +499,7 @@ const ActivitySection: React.FC = () => {
       
       <Select
         label="Tipo de ejercicio predominante"
-        value={localActivity.predominantType}
+        value={localActivity.predominantType || ''}
         options={typeOptions}
         onChange={(e) => setLocalActivity({ ...localActivity, predominantType: e.target.value as 'Fuerza' | 'Cardio' | 'Mixto' })}
       />
@@ -515,9 +533,12 @@ const NotificationsSection: React.FC = () => {
     }
   }, [user?.notifications]);
   
-  const handleToggle = (key: keyof typeof initialNotifications) => {
-    setLocalNotifications((prev: LocalNotifications) => ({ ...prev, [key]: !prev[key] }));
-  };
+  const handleToggle = useCallback((key: keyof LocalNotifications) => {
+    setLocalNotifications((prev) => ({ 
+      ...prev as LocalNotifications, // Corregido: Casting
+      [key]: !(prev as LocalNotifications)[key],
+    }));
+  }, []);
   
   const handleSave = async () => {
     if (!user) return;
@@ -560,25 +581,25 @@ const NotificationsSection: React.FC = () => {
     <div className="space-y-4">
       <ToggleRow 
         label="Notificaciones por Email" 
-        isChecked={localNotifications.email} 
+        // Corregido: Usar ?? false para manejar null (error 2322)
+        isChecked={localNotifications.email ?? false} 
         onChange={() => handleToggle('email')}
         detail="Recibe resúmenes semanales y actualizaciones."
       />
       <ToggleRow 
         label="Notificaciones Push" 
-        isChecked={localNotifications.push} 
+        // Corregido: Usar ?? false para manejar null (error 2322)
+        isChecked={localNotifications.push ?? false} 
         onChange={() => handleToggle('push')}
-        detail="Alertas importantes en tu dispositivo móvil."
       />
       <ToggleRow 
         label="Recordatorio de agua" 
-        isChecked={localNotifications.waterReminderEnabled} 
-        onChange={() => handleToggle('waterReminderEnabled')}
-        detail={`Cada ${localNotifications.waterReminderIntervalHours} horas.`}
+        isChecked={localNotifications.waterReminderEnabled ?? false} 
+        onChange={() => handleToggle('waterReminderEnabled')}   
       />
       <ToggleRow 
         label="Recordatorio de comida" 
-        isChecked={localNotifications.mealReminderEnabled} 
+        isChecked={localNotifications.mealReminderEnabled ?? false}
         onChange={() => handleToggle('mealReminderEnabled')}
         detail="Recordatorios basados en tus horarios de comida configurados."
       />
