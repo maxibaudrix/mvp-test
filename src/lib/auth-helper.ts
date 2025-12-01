@@ -1,18 +1,16 @@
-import { getServerSession } from 'next-auth';
-// Asumo que tu configuración de NextAuth está en '@/lib/auth'.
-// Este archivo debe existir y exportar 'authOptions'.
-import { auth } from '@/lib/auth'; 
+// src/lib/auth-helper.ts 
+import { auth } from "@/lib/auth";
+import type { NextRequest } from "next/server";
 
-/**
- * Obtiene el ID del usuario actual a partir de la sesión de NextAuth.
- * @returns El ID del usuario o null si no hay sesión o ID.
- */
-export async function getCurrentUserId(): Promise<string | null> {
-  const session = await getServerSession(auth);
+export async function getUserIdFromSession(request?: NextRequest) {
+  const session = request ? await auth(request.headers) : await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+  return session.user.id as string;
+}
 
-  if (!session?.user?.id) {
-    // Si no hay sesión o ID, devuelve null.
-    return null;
-  }
-  return session.user.id;
+export function handleUnauthorized() {
+  return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401,
+    headers: { "Content-Type": "application/json" },
+  });
 }
