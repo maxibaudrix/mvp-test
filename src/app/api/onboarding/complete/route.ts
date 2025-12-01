@@ -1,12 +1,12 @@
 // src/app/api/onboarding/complete/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { auth } from "@/auth";
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(auth);
+    const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, error: { message: 'No autenticado', code: 'UNAUTHORIZED' } },
