@@ -18,6 +18,7 @@ interface ProductData {
     fat: number; // por 100g
     servingSize: number; // gramos
     brand: string;
+    
 }
 
 // Mock data para simular el resultado de un escaneo/búsqueda

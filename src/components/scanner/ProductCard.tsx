@@ -17,7 +17,8 @@ interface ProductData {
 interface ProductCardProps {
     product: ProductData;
     score?: number | null; // <-- agregado
-    onOpen: () => void;    // <-- renombrado
+    onOpen: () => void;
+    onClose: () => void;    // <-- renombrado
 }
 
 // Placeholder para un componente Card simple con Tailwind
