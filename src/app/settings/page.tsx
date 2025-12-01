@@ -50,6 +50,16 @@ interface LocalNotifications {
   mealReminderEnabled: boolean;
 }
 
+// --- Definiciones de Opciones Faltantes (FIX para Error 2304) ---
+const dietOptions: DietType[] = ['Omnívora', 'Vegetariana', 'Vegana', 'Cetogénica'];
+const novaOptions = [
+  'Máximo nivel 4 (Ultra-procesados)', 
+  'Máximo nivel 3 (Procesados)',      
+  'Máximo nivel 2 (Ingredientes culinarios)',
+  'Máximo nivel 1 (Mínimamente procesados)'
+];
+const nutriScoreOptions: NutriScore[] = ['A', 'B', 'C', 'D', 'E'];
+
 // Componente utilitario de Input (Simulado)
 const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label: string }> = ({ label, ...props }) => (
   <div className="space-y-1">
@@ -321,13 +331,20 @@ const DietSection: React.FC = () => {
   // No hay setDietData en tu store actual, usamos setProfileData como placeholder o asumimos que existirá
   const setProfileData = useUserStore(state => state.setProfileData); 
   
-  // Tipos para el estado diet (ajustar según tu tipo AuthenticatedUser['diet'])
-  const initialDiet: LocalDiet = user?.diet || {
-    dietType: 'Omnívora' as DietType,
-    allergies: [],
-    maxNovaLevel: 4 as NovaLevel,
-    minNutriScore: 'E' as NutriScore
-  };
+  // FIX: Se realiza el mapeo seguro para evitar Error 2322 en la inicialización
+  const initialDiet: LocalDiet = user?.diet 
+    ? {
+        dietType: user.diet.dietType ?? 'Omnívora',
+        allergies: user.diet.allergies ?? [],
+        maxNovaLevel: user.diet.maxNovaLevel ?? 4,
+        minNutriScore: user.diet.minNutriScore ?? 'E',
+      }
+    : {
+        dietType: 'Omnívora' as DietType,
+        allergies: [],
+        maxNovaLevel: 4 as NovaLevel,
+        minNutriScore: 'E' as NutriScore
+      };
 
   const [isLoading, setIsLoading] = useState(false);
   // Se tipa explícitamente a LocalDiet para evitar problemas de nulidad en el componente
@@ -335,7 +352,7 @@ const DietSection: React.FC = () => {
 
   useEffect(() => {
     if (user?.diet) {
-      // FIX: Mapeo explícito y uso de ?? para evitar null (Error 2345/2322)
+      // Mapeo explícito y uso de ?? para evitar null en la actualización
       setLocalDiet({
         dietType: user.diet.dietType ?? 'Omnívora',
         allergies: user.diet.allergies ?? [],
@@ -345,10 +362,8 @@ const DietSection: React.FC = () => {
     }
   }, [user?.diet]);
 
-  // FIX: Se cerró correctamente la función handleAllergyChange
   const handleAllergyChange = (allergy: string) => {
     setLocalDiet((prev) => {
-        // Casting ya no es necesario si tipamos el useState<LocalDiet>
         const isAllergySelected = prev.allergies.includes(allergy);
 
         return {
@@ -358,7 +373,7 @@ const DietSection: React.FC = () => {
                 : [...prev.allergies, allergy]
         };
     });
-  }; // <--- FIX CRÍTICO: CIERRE DE FUNCIÓN
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -382,7 +397,7 @@ const DietSection: React.FC = () => {
     <div className="space-y-6">
       <Select
         label="Tipo de dieta"
-        // FIX: Usar || '' para manejar null si el tipo fuera DietType | null
+        // FIX: dietOptions definido globalmente
         value={localDiet.dietType} 
         options={dietOptions}
         onChange={(e) => setLocalDiet({ ...localDiet, dietType: e.target.value as DietType })}
@@ -396,7 +411,6 @@ const DietSection: React.FC = () => {
               key={allergy}
               onClick={() => handleAllergyChange(allergy)}
               className={`px-4 py-2 text-sm font-semibold rounded-full border transition-colors ${
-                // FIX: El check de nulidad en localDiet.allergies ya no es necesario si es LocalDiet
                 localDiet.allergies.includes(allergy)
                   ? 'bg-red-500 text-white border-red-500'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -411,14 +425,15 @@ const DietSection: React.FC = () => {
       <Select
         label="Preferencias NOVA (Procesamiento Mínimo)"
         value={`Máximo nivel ${localDiet.maxNovaLevel}`}
+        // FIX: novaOptions definido globalmente
         options={novaOptions}
         onChange={(e) => setLocalDiet({ ...localDiet, maxNovaLevel: parseInt(e.target.value.split(' ')[2]) as NovaLevel })}
       />
 
       <Select
         label="Nutri-Score mínimo aceptado"
-        // FIX: Usar || '' para manejar null si el tipo fuera NutriScore | null
         value={localDiet.minNutriScore}
+        // FIX: nutriScoreOptions definido globalmente
         options={nutriScoreOptions}
         onChange={(e) => setLocalDiet({ ...localDiet, minNutriScore: e.target.value as NutriScore })}
       />
@@ -436,23 +451,30 @@ const ActivitySection: React.FC = () => {
   // No hay setActivityData en tu store actual, solo logueamos la acción
   const setGoalsData = useUserStore(state => state.setGoalsData); 
 
+  // FIX: Define initialActivity con valores por defecto (Error 2304)
+  const initialActivity: LocalActivity = user?.activity
+    ? {
+        activityLevel: user.activity.activityLevel ?? 'Sedentario',
+        trainingDaysPerWeek: user.activity.trainingDaysPerWeek ?? 3,
+        predominantType: user.activity.predominantType ?? 'Mixto',
+      }
+    : {
+        activityLevel: 'Sedentario',
+        trainingDaysPerWeek: 3,
+        predominantType: 'Mixto',
+      };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [localActivity, setLocalActivity] = useState<LocalActivity>(initialActivity);
+
+  // FIX: Se unificó el mapeo en el estado inicial, pero se mantiene el useEffect para actualizaciones
   useEffect(() => {
     if (user?.activity) {
-      // FIX: Mapeo explícito y uso de ?? para evitar null (Error 2322)
       setLocalActivity({
         activityLevel: user.activity.activityLevel ?? 'Sedentario',
         trainingDaysPerWeek: user.activity.trainingDaysPerWeek ?? 3,
         predominantType: user.activity.predominantType ?? 'Mixto',
       });
-    }
-  }, [user?.activity]);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [localActivity, setLocalActivity] = useState<LocalActivity>(initialActivity);
-
-  useEffect(() => {
-    if (user?.activity) {
-      setLocalActivity(user.activity as LocalActivity);
     }
   }, [user?.activity]);
   
@@ -495,7 +517,6 @@ const ActivitySection: React.FC = () => {
               trainingDaysPerWeek: Math.max(0, prev.trainingDaysPerWeek - 1) 
             }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-            // FIX: Usar ?? 0 o asumir que es un número si se inicializó
             disabled={localActivity.trainingDaysPerWeek <= 0}
           >
             <Minus className="w-5 h-5 text-gray-700" />
@@ -507,7 +528,6 @@ const ActivitySection: React.FC = () => {
               trainingDaysPerWeek: Math.min(7, prev.trainingDaysPerWeek + 1) 
             }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-            // FIX: Usar ?? 0 o asumir que es un número si se inicializó
             disabled={localActivity.trainingDaysPerWeek >= 7}
           >
             <Plus className="w-5 h-5 text-gray-700" />
@@ -534,9 +554,29 @@ const NotificationsSection: React.FC = () => {
   // No hay setNotificationsData en tu store actual, solo logueamos la acción
   const setGoalsData = useUserStore(state => state.setGoalsData); 
 
+  // FIX: Define initialNotifications con valores por defecto (Error 2552)
+  const initialNotifications: LocalNotifications = user?.notifications
+    ? {
+        email: user.notifications.email ?? true,
+        push: user.notifications.push ?? true,
+        waterReminderEnabled: user.notifications.waterReminderEnabled ?? true,
+        waterReminderIntervalHours: user.notifications.waterReminderIntervalHours ?? 2,
+        mealReminderEnabled: user.notifications.mealReminderEnabled ?? true,
+      }
+    : {
+        email: true,
+        push: true,
+        waterReminderEnabled: true,
+        waterReminderIntervalHours: 2,
+        mealReminderEnabled: true,
+      };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [localNotifications, setLocalNotifications] = useState<LocalNotifications>(initialNotifications);
+
+  // FIX: Se unificó el mapeo en el estado inicial, pero se mantiene el useEffect para actualizaciones
   useEffect(() => {
     if (user?.notifications) {
-      // FIX: Mapeo explícito y uso de ?? para evitar null (Error 2322)
       setLocalNotifications({
         email: user.notifications.email ?? true,
         push: user.notifications.push ?? true,
@@ -544,15 +584,6 @@ const NotificationsSection: React.FC = () => {
         waterReminderIntervalHours: user.notifications.waterReminderIntervalHours ?? 2,
         mealReminderEnabled: user.notifications.mealReminderEnabled ?? true,
       });
-    }
-  }, [user?.notifications]);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [localNotifications, setLocalNotifications] = useState<LocalNotifications>(initialNotifications);
-
-  useEffect(() => {
-    if (user?.notifications) {
-      setLocalNotifications(user.notifications as LocalNotifications);
     }
   }, [user?.notifications]);
   
@@ -604,24 +635,23 @@ const NotificationsSection: React.FC = () => {
     <div className="space-y-4">
       <ToggleRow 
         label="Notificaciones por Email" 
-        // FIX: Se usa el valor por defecto 'false' si es null (aunque se inicializó)
-        isChecked={localNotifications.email ?? false} 
+        isChecked={localNotifications.email} 
         onChange={() => handleToggle('email')}
         detail="Recibe resúmenes semanales y actualizaciones."
       />
       <ToggleRow 
         label="Notificaciones Push" 
-        isChecked={localNotifications.push ?? false} 
+        isChecked={localNotifications.push} 
         onChange={() => handleToggle('push')}
       />
       <ToggleRow 
         label="Recordatorio de agua" 
-        isChecked={localNotifications.waterReminderEnabled ?? false} 
+        isChecked={localNotifications.waterReminderEnabled} 
         onChange={() => handleToggle('waterReminderEnabled')}   
       />
       <ToggleRow 
         label="Recordatorio de comida" 
-        isChecked={localNotifications.mealReminderEnabled ?? false}
+        isChecked={localNotifications.mealReminderEnabled}
         onChange={() => handleToggle('mealReminderEnabled')}
         detail="Recordatorios basados en tus horarios de comida configurados."
       />
