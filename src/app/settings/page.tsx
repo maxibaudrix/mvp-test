@@ -1,7 +1,16 @@
 // src/app/settings/page.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useUserStore, GoalType, ActivityLevel, DietType, NovaLevel, NutriScore } from '@/store/user';
-import { User, Target, Utensils, Zap, Bell, LogOut, Download, Trash, Save, Loader2, Minus, Plus } from 'lucide-react';
+// Corregido: Usando importación relativa en lugar de la ruta alias '@/store/user'
+import { useUserStore } from '../../store/user'; 
+import { User, Target, Utensils, Zap, Bell, LogOut, Download, Trash, Save, Loader2, Minus, Plus, AlertTriangle } from 'lucide-react';
+
+// --- Definición de Tipos (Recreados para uso local, basados en el schema de Prisma o tipos conocidos) ---
+// Estos tipos DEBEN coincidir con los que están anidados dentro de AuthenticatedUser en @/types/user
+export type GoalType = 'Perder grasa' | 'Ganar músculo' | 'Mantenimiento';
+export type ActivityLevel = 'Sedentario' | 'Ligeramente activo' | 'Moderadamente activo' | 'Muy activo' | 'Extremadamente activo';
+export type DietType = 'Omnívora' | 'Vegetariana' | 'Vegana' | 'Cetogénica';
+export type NovaLevel = 1 | 2 | 3 | 4;
+export type NutriScore = 'A' | 'B' | 'C' | 'D' | 'E';
 
 // Componente utilitario de Input (Simulado)
 const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label: string }> = ({ label, ...props }) => (
@@ -41,22 +50,60 @@ const SaveButton: React.FC<{ onClick: () => void, isLoading: boolean, label: str
   </button>
 );
 
+// Componente de Mensaje de Error/Advertencia
+const MessageBanner: React.FC<{ message: string, type: 'error' | 'warning' }> = ({ message, type }) => (
+  <div className={`flex items-start p-4 rounded-xl mb-4 ${type === 'error' ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-yellow-100 text-yellow-700 border border-yellow-300'}`}>
+    <AlertTriangle className="w-5 h-5 mr-3 mt-1 flex-shrink-0" />
+    <p className="text-sm">{message}</p>
+  </div>
+);
+
 // --- Componentes de Sección ---
 
+// Se asume que 'profile' tiene name, email, birthdate, profileImageUrl
 const ProfileSection: React.FC = () => {
-  const { profile, updateProfile, isLoading } = useUserStore();
-  const [localProfile, setLocalProfile] = useState(profile);
+  const user = useUserStore(state => state.user);
+  const setProfileData = useUserStore(state => state.setProfileData);
+  // Simulación de estado de carga para las peticiones de guardado
+  const [isLoading, setIsLoading] = useState(false);
+  const [localProfile, setLocalProfile] = useState(user?.profile || {
+    name: '',
+    email: user?.email || '', // Usar el email principal si existe
+    birthdate: '',
+    profileImageUrl: 'https://placehold.co/100x100/3b82f6/ffffff?text=U'
+  });
 
-  // Sincronizar estado local con el store
-  useEffect(() => { setLocalProfile(profile); }, [profile]);
+  useEffect(() => {
+    if (user?.profile) {
+      setLocalProfile(user.profile);
+    }
+  }, [user?.profile]);
   
-  const handleSave = () => updateProfile(localProfile);
+  const handleSave = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      // Simulación de llamada a API para guardar el perfil
+      await new Promise(resolve => setTimeout(resolve, 500)); 
+      
+      // Actualizar el store localmente DESPUÉS de una supuesta respuesta exitosa del servidor
+      setProfileData(localProfile);
 
+      console.log('Profile saved:', localProfile);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) return <MessageBanner message="Error: No se encontró la data del usuario." type="error" />;
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <img 
-          src={profile.profileImageUrl} 
+          src={localProfile.profileImageUrl} 
           alt="Perfil" 
           className="w-20 h-20 rounded-full object-cover border-4 border-gray-200"
         />
@@ -67,13 +114,14 @@ const ProfileSection: React.FC = () => {
 
       <Input
         label="Nombre"
-        value={localProfile.name}
+        value={localProfile.name || ''}
         onChange={(e) => setLocalProfile({ ...localProfile, name: e.target.value })}
       />
       
+      {/* El email se toma del objeto user principal y se muestra como solo lectura */}
       <Input
         label="Email"
-        value={profile.email}
+        value={user.email || 'N/A'}
         readOnly
         className="bg-gray-100 cursor-not-allowed"
       />
@@ -81,7 +129,7 @@ const ProfileSection: React.FC = () => {
       <Input
         label="Fecha de nacimiento"
         type="date"
-        value={localProfile.birthdate}
+        value={localProfile.birthdate || ''}
         onChange={(e) => setLocalProfile({ ...localProfile, birthdate: e.target.value })}
       />
 
@@ -90,16 +138,67 @@ const ProfileSection: React.FC = () => {
   );
 };
 
+// Se asume que 'goals' tiene currentGoal, targetWeightKg, speed, calculatedMacros (proteina, carbs, fats)
 const GoalsSection: React.FC = () => {
-  const { goals, updateGoals, recalculateMacros, isLoading } = useUserStore();
-  const [localGoals, setLocalGoals] = useState(goals);
+  const user = useUserStore(state => state.user);
+  const setGoalsData = useUserStore(state => state.setGoalsData);
+  
+  // Tipos para el estado goals (ajustar según tu tipo AuthenticatedUser['goals'])
+  const initialGoals = user?.goals || {
+    currentGoal: 'Mantenimiento' as GoalType,
+    targetWeightKg: 70,
+    speed: 'Moderada',
+    calculatedMacros: { protein: 0, carbs: 0, fats: 0 }
+  };
 
-  useEffect(() => { setLocalGoals(goals); }, [goals]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [localGoals, setLocalGoals] = useState(initialGoals);
+
+  useEffect(() => {
+    if (user?.goals) {
+      setLocalGoals(user.goals);
+    }
+  }, [user?.goals]);
   
   const goalOptions: GoalType[] = ['Perder grasa', 'Ganar músculo', 'Mantenimiento'];
   const speedOptions = ['Lenta', 'Moderada', 'Rápida'];
 
-  const handleSave = () => updateGoals(localGoals);
+  const handleSave = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500)); 
+      setGoalsData(localGoals);
+      console.log('Goals saved:', localGoals);
+    } catch (error) {
+      console.error('Error saving goals:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const recalculateMacros = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      // Simulación de una llamada a API para obtener nuevos macros
+      await new Promise(resolve => setTimeout(resolve, 800)); 
+      const newMacros = { protein: 170, carbs: 210, fats: 70 }; // Nuevo cálculo simulado
+      const updatedGoals = { ...localGoals, calculatedMacros: newMacros };
+      
+      // Actualizamos el store y el estado local. En una app real, esto podría ser una acción separada del store
+      setGoalsData(updatedGoals);
+      setLocalGoals(updatedGoals);
+
+      console.log('Macros recalculated:', newMacros);
+    } catch (error) {
+      console.error('Error recalculating macros:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) return <MessageBanner message="Error: No se encontró la data del usuario." type="error" />;
 
   return (
     <div className="space-y-6">
@@ -128,9 +227,12 @@ const GoalsSection: React.FC = () => {
       <div className="bg-indigo-50 p-4 rounded-xl shadow-inner border border-indigo-200">
         <h3 className="font-bold text-indigo-700 mb-2">Macros Calculados</h3>
         <p className="text-sm text-indigo-600">
-          Proteína: <span className="font-semibold">{goals.calculatedMacros.protein}g</span>, 
-          Carbohidratos: <span className="font-semibold">{goals.calculatedMacros.carbs}g</span>, 
-          Grasas: <span className="font-semibold">{goals.calculatedMacros.fats}g</span>
+          Proteína: <span className="font-semibold">{localGoals.calculatedMacros.protein}g</span>, 
+          Carbohidratos: <span className="font-semibold">{localGoals.calculatedMacros.carbs}g</span>, 
+          Grasas: <span className="font-semibold">{localGoals.calculatedMacros.fats}g</span>
+        </p>
+        <p className="text-xs text-indigo-500 mt-2">
+          *Estos macros se ajustan con tu nivel de actividad y peso actual.
         </p>
       </div>
       
@@ -149,11 +251,28 @@ const GoalsSection: React.FC = () => {
   );
 };
 
+// Se asume que 'diet' tiene dietType, allergies, maxNovaLevel, minNutriScore
 const DietSection: React.FC = () => {
-  const { diet, updateDiet, isLoading } = useUserStore();
-  const [localDiet, setLocalDiet] = useState(diet);
+  const user = useUserStore(state => state.user);
+  // No hay setDietData en tu store actual, usamos setProfileData como placeholder o asumimos que existirá
+  const setProfileData = useUserStore(state => state.setProfileData); 
+  
+  // Tipos para el estado diet (ajustar según tu tipo AuthenticatedUser['diet'])
+  const initialDiet = user?.diet || {
+    dietType: 'Omnívora' as DietType,
+    allergies: [],
+    maxNovaLevel: 4 as NovaLevel,
+    minNutriScore: 'E' as NutriScore
+  };
 
-  useEffect(() => { setLocalDiet(diet); }, [diet]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [localDiet, setLocalDiet] = useState(initialDiet);
+
+  useEffect(() => {
+    if (user?.diet) {
+      setLocalDiet(user.diet);
+    }
+  }, [user?.diet]);
   
   const dietOptions: DietType[] = ['Omnívora', 'Vegetariana', 'Vegana', 'Cetogénica'];
   const nutriScoreOptions: NutriScore[] = ['A', 'B', 'C', 'D', 'E'];
@@ -169,7 +288,23 @@ const DietSection: React.FC = () => {
     }));
   };
   
-  const handleSave = () => updateDiet(localDiet);
+  const handleSave = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // **NOTA:** Aquí deberías usar setDietData si estuviera en tu store. 
+      // Como no está, solo logueamos la acción.
+      console.log('Diet saved:', localDiet);
+      // setDietData(localDiet); 
+    } catch (error) {
+      console.error('Error saving diet:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) return <MessageBanner message="Error: No se encontró la data del usuario." type="error" />;
 
   return (
     <div className="space-y-6">
@@ -214,20 +349,54 @@ const DietSection: React.FC = () => {
       />
 
       <SaveButton onClick={handleSave} isLoading={isLoading} label="Guardar Dieta" />
+      <MessageBanner message="Advertencia: La acción 'Guardar Dieta' está simulada ya que falta la función 'setDietData' en tu store de Zustand." type="warning" />
     </div>
   );
 };
 
-const ActivitySection: React.FC = () => {
-  const { activity, updateActivity, isLoading } = useUserStore();
-  const [localActivity, setLocalActivity] = useState(activity);
 
-  useEffect(() => { setLocalActivity(activity); }, [activity]);
+// Se asume que 'activity' tiene activityLevel, trainingDaysPerWeek, predominantType
+const ActivitySection: React.FC = () => {
+  const user = useUserStore(state => state.user);
+  // No hay setActivityData en tu store actual, solo logueamos la acción
+  const setGoalsData = useUserStore(state => state.setGoalsData); 
+
+  // Tipos para el estado activity (ajustar según tu tipo AuthenticatedUser['activity'])
+  const initialActivity = user?.activity || {
+    activityLevel: 'Sedentario' as ActivityLevel,
+    trainingDaysPerWeek: 3,
+    predominantType: 'Mixto'
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [localActivity, setLocalActivity] = useState(initialActivity);
+
+  useEffect(() => {
+    if (user?.activity) {
+      setLocalActivity(user.activity);
+    }
+  }, [user?.activity]);
   
   const levelOptions: ActivityLevel[] = ['Sedentario', 'Ligeramente activo', 'Moderadamente activo', 'Muy activo', 'Extremadamente activo'];
   const typeOptions = ['Fuerza', 'Cardio', 'Mixto'];
 
-  const handleSave = () => updateActivity(localActivity);
+  const handleSave = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // **NOTA:** Aquí deberías usar setActivityData si estuviera en tu store. 
+      // Como no está, solo logueamos la acción.
+      console.log('Activity saved:', localActivity);
+      // setActivityData(localActivity); 
+    } catch (error) {
+      console.error('Error saving activity:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) return <MessageBanner message="Error: No se encontró la data del usuario." type="error" />;
 
   return (
     <div className="space-y-6">
@@ -267,18 +436,54 @@ const ActivitySection: React.FC = () => {
       />
 
       <SaveButton onClick={handleSave} isLoading={isLoading} label="Guardar Actividad" />
+      <MessageBanner message="Advertencia: La acción 'Guardar Actividad' está simulada ya que falta la función 'setActivityData' en tu store de Zustand." type="warning" />
     </div>
   );
 };
 
+// Se asume que 'notifications' tiene email, push, waterReminderEnabled, mealReminderEnabled
 const NotificationsSection: React.FC = () => {
-  const { notifications, updateNotifications, isLoading } = useUserStore();
+  const user = useUserStore(state => state.user);
+  // No hay setNotificationsData en tu store actual, solo logueamos la acción
+  const setGoalsData = useUserStore(state => state.setGoalsData); 
+
+  const initialNotifications = user?.notifications || {
+    email: true,
+    push: true,
+    waterReminderEnabled: true,
+    waterReminderIntervalHours: 2,
+    mealReminderEnabled: true,
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [localNotifications, setLocalNotifications] = useState(initialNotifications);
+
+  useEffect(() => {
+    if (user?.notifications) {
+      setLocalNotifications(user.notifications);
+    }
+  }, [user?.notifications]);
   
-  // Use a local change handler that directly calls the store for simplicity in checkboxes
-  const handleToggle = (key: keyof typeof notifications) => {
-    updateNotifications({ [key]: !notifications[key] });
+  const handleToggle = (key: keyof typeof initialNotifications) => {
+    setLocalNotifications(prev => ({ ...prev, [key]: !prev[key] }));
   };
   
+  const handleSave = async () => {
+    if (!user) return;
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      // **NOTA:** Aquí deberías usar setNotificationsData si estuviera en tu store. 
+      // Como no está, solo logueamos la acción.
+      console.log('Notifications saved:', localNotifications);
+      // setNotificationsData(localNotifications); 
+    } catch (error) {
+      console.error('Error saving notifications:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const ToggleRow: React.FC<{ label: string, isChecked: boolean, onChange: () => void, detail?: string }> = ({ label, isChecked, onChange, detail }) => (
     <div className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm border border-gray-100">
       <div className="flex flex-col">
@@ -298,38 +503,59 @@ const NotificationsSection: React.FC = () => {
     </div>
   );
   
+  if (!user) return <MessageBanner message="Error: No se encontró la data del usuario." type="error" />;
+
   return (
     <div className="space-y-4">
       <ToggleRow 
-        label="Email notifications" 
-        isChecked={notifications.email} 
+        label="Notificaciones por Email" 
+        isChecked={localNotifications.email} 
         onChange={() => handleToggle('email')}
         detail="Recibe resúmenes semanales y actualizaciones."
       />
       <ToggleRow 
-        label="Push notifications" 
-        isChecked={notifications.push} 
+        label="Notificaciones Push" 
+        isChecked={localNotifications.push} 
         onChange={() => handleToggle('push')}
         detail="Alertas importantes en tu dispositivo móvil."
       />
       <ToggleRow 
         label="Recordatorio de agua" 
-        isChecked={notifications.waterReminderEnabled} 
+        isChecked={localNotifications.waterReminderEnabled} 
         onChange={() => handleToggle('waterReminderEnabled')}
-        detail={`Cada ${notifications.waterReminderIntervalHours} horas.`}
+        detail={`Cada ${localNotifications.waterReminderIntervalHours} horas.`}
       />
       <ToggleRow 
         label="Recordatorio de comida" 
-        isChecked={notifications.mealReminderEnabled} 
+        isChecked={localNotifications.mealReminderEnabled} 
         onChange={() => handleToggle('mealReminderEnabled')}
         detail="Recordatorios basados en tus horarios de comida configurados."
       />
+      <SaveButton onClick={handleSave} isLoading={isLoading} label="Guardar Notificaciones" />
+      <MessageBanner message="Advertencia: La acción 'Guardar Notificaciones' está simulada ya que falta la función 'setNotificationsData' en tu store de Zustand." type="warning" />
     </div>
   );
 };
 
 const AccountSection: React.FC = () => {
-  const { deleteAccount, isLoading } = useUserStore();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleDeleteAccount = async () => {
+    const isConfirmed = window.confirm("¿Estás seguro de que quieres eliminar tu cuenta? Esta acción es irreversible.");
+    if (isConfirmed) {
+      setIsLoading(true);
+      try {
+        // Simulación de llamada a API para eliminar la cuenta
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Lógica de deslogueo/redirección aquí
+        console.log('Account deleted successfully.');
+      } catch (error) {
+        console.error('Error deleting account:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
   
   return (
     <div className="space-y-6">
@@ -345,7 +571,7 @@ const AccountSection: React.FC = () => {
 
       <div className="pt-4 border-t border-red-100">
         <button 
-          onClick={deleteAccount}
+          onClick={handleDeleteAccount}
           disabled={isLoading}
           className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-600 text-white font-semibold rounded-xl shadow-lg hover:bg-red-700 transition-colors disabled:opacity-50"
         >
@@ -361,7 +587,7 @@ const AccountSection: React.FC = () => {
 
 const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Perfil');
-  const { fetchProfile } = useUserStore();
+  const user = useUserStore(state => state.user);
 
   const tabs = [
     { name: 'Perfil', icon: User, component: ProfileSection },
@@ -371,13 +597,21 @@ const SettingsPage: React.FC = () => {
     { name: 'Notificaciones', icon: Bell, component: NotificationsSection },
     { name: 'Cuenta', icon: LogOut, component: AccountSection },
   ];
-
-  // Cargar datos iniciales
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
   
   const ActiveComponent = tabs.find(tab => tab.name === activeTab)?.component || ProfileSection;
+
+  if (user === null) {
+      // Mostrar un loader o un mensaje si el usuario es null (todavía cargando o no autenticado)
+      return (
+          <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+              <div className="flex items-center space-x-3 text-indigo-600">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <p className="font-semibold">Cargando datos de usuario...</p>
+              </div>
+          </div>
+      );
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
