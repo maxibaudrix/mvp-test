@@ -5,6 +5,8 @@ import { create } from 'zustand';
 // Usamos el import de generator solo para los tipos, no para la ejecución de la función aquí.
 import type { MealPlanEntry, WeeklyStats, PlanPreferences, RecipeSummary } from '@/lib/mealPlanEngine/generator';
 
+export type { MealPlanEntry, PlanPreferences };
+
 // --- Funciones de Utilidad de Fecha (Para manejo de semanas dinámicas) ---
 
 // Obtiene la fecha de inicio (Lunes) y fin (Domingo) de una semana dada su string 'YYYY-WXX'
