@@ -350,10 +350,10 @@ model PlannedMeal {
   week      String   
   
   // Almacena el array WeeklyPlan.plan (el detalle de las comidas de 7 días)
-  planJson  Json     
+  planJson  String    
   
   // Almacena el objeto WeeklyPlan.weeklyStats (calorías y macros promedio)
-  statsJson Json     
+  statsJson String     
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
