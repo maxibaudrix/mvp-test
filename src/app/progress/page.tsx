@@ -10,7 +10,7 @@ import {
 // Se asume que estos componentes existen en tu proyecto
 // RUTAS CORREGIDAS PARA EVITAR ERRORES DE RESOLUCIÓN DE ALIASES (@/)
 import { WeightChart } from '../../components/progress/WeightChart'; 
-import { useProgressStore } from '../../../store/progress';
+import { useProgressStore } from '../../store/progress';
 
 // Mock de Periodos (para el selector)
 const periods = [
