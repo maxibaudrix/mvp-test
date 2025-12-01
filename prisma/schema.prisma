@@ -32,6 +32,14 @@ model User {
   workouts        Workout[]
   progress        ProgressTracking[]
   recipes         Recipe[]
+
+  // ADDED RELATIONS
+  weightEntries   WeightEntry[]      // For WeightEntry
+  measurements    BodyMeasurement[]  // For BodyMeasurement
+  progressPhotos  ProgressPhoto[]    // For ProgressPhoto
+  diaryMeals      DiaryMeal[]        // For DiaryMeal
+  plannedMeals    PlannedMeal[]      // For PlannedMeal
+  dailyWater      DailyWater[]       // For DailyWater
 }
 
 model Account {
@@ -160,6 +168,9 @@ model ScannedProduct {
 
   imageUrl  String?
   scannedAt DateTime @default(now())
+
+  // ADDED RELATION
+  diaryEntries DiaryMeal[] // For DiaryMeal
 
   @@index([userId, scannedAt])
 }
