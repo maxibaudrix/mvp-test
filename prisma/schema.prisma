@@ -297,6 +297,11 @@ model Recipe {
   prepTimeMinutes    Int?
   cookTimeMinutes    Int?
 
+  // AGREGAR ESTOS CAMPOS DE MACRONUTRIENTES
+  protein            Float // En gramos
+  carbs              Float // En gramos
+  fats               Float // En gramos
+
   favorited Boolean @default(false)
   rating    Int?
 
@@ -319,6 +324,34 @@ model DiaryMeal {
   createdAt   DateTime @default(now()) // Hora exacta de registro
 
   @@index([userId, date])
+}
+
+// ============================================\
+// MEAL PLANNER
+// ============================================\
+
+model PlannedMeal {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Identificador de la semana (e.g., "2024-W40" o la fecha de inicio de la semana)
+  week      String   
+  
+  // Almacena el array WeeklyPlan.plan (el detalle de las comidas de 7 días)
+  planJson  Json     
+  
+  // Almacena el objeto WeeklyPlan.weeklyStats (calorías y macros promedio)
+  statsJson Json     
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // **CRUCIAL**: Asegura que un usuario solo tenga un plan por semana.
+  @@unique([userId, week]) 
+  
+  // Asegura una búsqueda rápida por usuario y semana
+  @@index([userId, week]) 
 }
 
 model DailyWater {
