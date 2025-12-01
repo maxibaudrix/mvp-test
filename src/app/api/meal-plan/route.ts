@@ -204,7 +204,7 @@ export async function PATCH(req: NextRequest) {
         await prisma.plannedMeal.update({
             where: { userId_week: { userId, week } },
             data: {
-                planJson: planArray, // Prisma serializa el objeto actualizado
+                planJson: JSON.stringify(planArray), // Prisma serializa el objeto actualizado
                 // Idealmente, aquí también se re-calcularía y actualizaría 'statsJson'.
             }
         });
@@ -259,7 +259,7 @@ export async function DELETE(req: NextRequest) {
         await prisma.plannedMeal.update({
             where: { userId_week: { userId, week } },
             data: {
-                planJson: planArray,
+                planJson: JSON.stringify(planArray),
             }
         });
 
