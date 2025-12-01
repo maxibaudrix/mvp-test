@@ -87,44 +87,6 @@ export async function POST(req: NextRequest) {
     }
 }
 
-
-// ----------------------------------------------------
-// POST /api/shopping/add (Añadir ítem manual)
-// ----------------------------------------------------
-export async function POST(req: NextRequest) {
-    // Este endpoint debe ser una función separada en Next.js (por convención),
-    // pero aquí lo incluimos con el nombre del path.
-    const userId = getUserIdFromSession(req);
-    if (!userId) return handleUnauthorized();
-    
-    // Obtenemos el path para distinguir si es POST o POST_ADD, aunque lo ideal es usar un subdirectorio.
-    if (req.nextUrl.pathname.endsWith('/api/shopping/add')) {
-        try {
-            const body = await req.json();
-            const newItemDetails = body as Omit<ShoppingItem, 'id' | 'isPurchased'>;
-            
-            // 1. PRISMA: Crear un nuevo ShoppingListItem
-            const newId = (Math.random() * 1000).toFixed(0);
-            const newItem: ShoppingItem = {
-                ...newItemDetails,
-                id: `manual_${newId}`,
-                isPurchased: false,
-            };
-
-            // 2. PRISMA: Actualizar la lista principal del usuario.
-            
-            // Simulación:
-            return NextResponse.json(newItem, { status: 201 });
-        } catch (error) {
-            console.error("Error adding item:", error);
-            return NextResponse.json({ error: "Failed to add item" }, { status: 500 });
-        }
-    } else {
-        // Si el path es /api/shopping, llamamos a la función de generación
-        return POST(req); 
-    }
-}
-
 // ----------------------------------------------------
 // PATCH /api/shopping/item/[id] (Marcar como comprado)
 // Se implementa con un solo handler PATCH que delega.
