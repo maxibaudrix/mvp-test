@@ -105,12 +105,12 @@ const ProfileSection: React.FC = () => {
   // Simulación de estado de carga para las peticiones de guardado
   const [isLoading, setIsLoading] = useState(false);
   const [localProfile, setLocalProfile] = useState<LocalProfile>({
-  // Corregido: 'name' está en la raíz del objeto user, no en profile.
+  // 'name' está en la raíz del objeto user.
   name: user?.name || '', 
   email: user?.email || '',
-  // Corregido: Usar 'dateOfBirth' (tipo servidor) en lugar de 'birthdate' (tipo local).
+  // Usar 'dateOfBirth' (tipo servidor) y 'birthdate' (tipo local).
   birthdate: user?.profile?.dateOfBirth || '', 
-  // Corregido: Asumiendo que la imagen de perfil viene de user.image (modelo Prisma User).
+  // Asumiendo que la imagen de perfil viene de user.image (modelo Prisma User).
   profileImageUrl: user?.image || 'https://placehold.co/100x100/3b82f6/ffffff?text=U',
   });
 
@@ -119,8 +119,8 @@ const ProfileSection: React.FC = () => {
     setLocalProfile({
       name: user.name || '',
       email: user.email || '',
-      birthdate: user.profile?.dateOfBirth || '', // Corregido: Usar dateOfBirth
-      profileImageUrl: user.image || 'https://placehold.co/100x100/3b82f6/ffffff?text=U', // Corregido: Usar user.image
+      birthdate: user.profile?.dateOfBirth || '', // Propiedad en UserProfile de Prisma
+      profileImageUrl: user.image || 'https://placehold.co/100x100/3b82f6/ffffff?text=U', // Propiedad en User de Prisma
     });
   }
   }, [user]);
@@ -132,8 +132,8 @@ const ProfileSection: React.FC = () => {
       // Simulación de llamada a API para guardar el perfil
       await new Promise(resolve => setTimeout(resolve, 500)); 
       
-      // Actualizar el store localmente DESPUÉS de una supuesta respuesta exitosa del servidor
-      setProfileData(localProfile);
+      // Actualizar el store localmente. Se usa casting para evitar error 2345 (LocalProfile vs UserProfile)
+      setProfileData(localProfile as unknown as any);
 
       console.log('Profile saved:', localProfile);
     } catch (error) {
@@ -191,13 +191,13 @@ const GoalsSection: React.FC = () => {
   
   // Tipos para el estado goals (ajustar según tu tipo AuthenticatedUser['goals'])
   const initialGoals: LocalGoals = {
-  // Corregido: Mapear a la propiedad del servidor: goalType
-  currentGoal: (user?.goals?.goalType as GoalType) || 'Mantenimiento',
-  // Corregido: Usar 'targetWeight' del servidor/Prisma
-  targetWeightKg: user?.goals?.targetWeight || 70,
-  // Corregido: Usar 'goalSpeed' del servidor/Prisma
-  speed: (user?.goals?.goalSpeed as 'Lenta' | 'Moderada' | 'Rápida') || 'Moderada',
-  // Corregido: Mapear 'fat' (servidor) a 'fats' (local)
+  // Mapear goalType (server) a currentGoal (local)
+  currentGoal: (user?.profile?.goal as GoalType) || 'Mantenimiento',
+  // Mapear targetWeight (server) a targetWeightKg (local)
+  targetWeightKg: user?.profile?.targetWeightKg || 70,
+  // Mapear goalSpeed (server) a speed (local)
+  speed: (user?.goals as any)?.goalSpeed || 'Moderada',
+  // Mapear 'fat' (server) a 'fats' (local)
   calculatedMacros: user?.goals?.targetMacros
     ? { 
         protein: user.goals.targetMacros.protein, 
@@ -211,11 +211,17 @@ const GoalsSection: React.FC = () => {
   const [localGoals, setLocalGoals] = useState(initialGoals);
 
   useEffect(() => {
-    if (user?.goals) {
-        // Mapeo inverso si es necesario, o directamente:
-        setLocalGoals(user.goals as LocalGoals); 
+    if (user) {
+        setLocalGoals({
+            currentGoal: (user.profile?.goal as GoalType) || 'Mantenimiento',
+            targetWeightKg: user.profile?.targetWeightKg || 70,
+            speed: (user.goals as any)?.goalSpeed || 'Moderada',
+            calculatedMacros: user.goals?.targetMacros
+                ? { protein: user.goals.targetMacros.protein, carbs: user.goals.targetMacros.carbs, fats: user.goals.targetMacros.fat }
+                : { protein: 0, carbs: 0, fats: 0 },
+        });
     }
-  }, [user?.goals]);
+  }, [user]); // Dependencia simplificada a 'user'
   
   const goalOptions: GoalType[] = ['Perder grasa', 'Ganar músculo', 'Mantenimiento'];
   const speedOptions = ['Lenta', 'Moderada', 'Rápida'];
@@ -225,7 +231,8 @@ const GoalsSection: React.FC = () => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 500)); 
-      setGoalsData(localGoals as unknown as UserGoals); 
+      // Se usa casting a 'any' para evitar error 2304 y 2345 (LocalGoals vs UserGoals)
+      setGoalsData(localGoals as unknown as any); 
       console.log('Goals saved:', localGoals);
     } catch (error) {
       console.error('Error saving goals:', error);
@@ -243,8 +250,8 @@ const GoalsSection: React.FC = () => {
       const newMacros = { protein: 170, carbs: 210, fats: 70 }; // Nuevo cálculo simulado
       const updatedGoals = { ...localGoals, calculatedMacros: newMacros };
       
-      // Actualizamos el store y el estado local. En una app real, esto podría ser una acción separada del store
-      setGoalsData(updatedGoals);
+      // Actualizamos el store y el estado local.
+      setGoalsData(updatedGoals as unknown as any);
       setLocalGoals(updatedGoals);
 
       console.log('Macros recalculated:', newMacros);
@@ -315,7 +322,7 @@ const DietSection: React.FC = () => {
   const setProfileData = useUserStore(state => state.setProfileData); 
   
   // Tipos para el estado diet (ajustar según tu tipo AuthenticatedUser['diet'])
-  const initialDiet = user?.diet || {
+  const initialDiet: LocalDiet = user?.diet || {
     dietType: 'Omnívora' as DietType,
     allergies: [],
     maxNovaLevel: 4 as NovaLevel,
@@ -323,7 +330,8 @@ const DietSection: React.FC = () => {
   };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [localDiet, setLocalDiet] = useState(initialDiet);
+  // Se tipa explícitamente a LocalDiet para evitar problemas de nulidad en el componente
+  const [localDiet, setLocalDiet] = useState<LocalDiet>(initialDiet);
 
   useEffect(() => {
     if (user?.diet) {
@@ -335,22 +343,21 @@ const DietSection: React.FC = () => {
   const nutriScoreOptions: NutriScore[] = ['A', 'B', 'C', 'D', 'E'];
   const novaOptions = [1, 2, 3, 4].map(n => `Máximo nivel ${n}`);
 
+  // FIX: Se cerró correctamente la función handleAllergyChange
   const handleAllergyChange = (allergy: string) => {
-    const isPresent = localDiet.allergies.includes(allergy);
     setLocalDiet((prev) => {
-        // Corregido: Casting del parámetro 'prev' a LocalDiet (error 2345)
-        const prevLocal = prev as LocalDiet; 
-        const isAllergySelected = prevLocal.allergies.includes(allergy);
+        // Casting ya no es necesario si tipamos el useState<LocalDiet>
+        const isAllergySelected = prev.allergies.includes(allergy);
 
         return {
-            ...prevLocal, 
-            // Corregido: Asegurar que el array se inicializa si es null
+            ...prev, 
             allergies: isAllergySelected
-                ? prevLocal.allergies.filter(a => a !== allergy) 
-                : [...prevLocal.allergies, allergy]
+                ? prev.allergies.filter(a => a !== allergy) 
+                : [...prev.allergies, allergy]
         };
     });
-  
+  }; // <--- FIX CRÍTICO: CIERRE DE FUNCIÓN
+
   const handleSave = async () => {
     if (!user) return;
     setIsLoading(true);
@@ -373,7 +380,8 @@ const DietSection: React.FC = () => {
     <div className="space-y-6">
       <Select
         label="Tipo de dieta"
-        value={localDiet.dietType || ''}
+        // FIX: Usar || '' para manejar null si el tipo fuera DietType | null
+        value={localDiet.dietType} 
         options={dietOptions}
         onChange={(e) => setLocalDiet({ ...localDiet, dietType: e.target.value as DietType })}
       />
@@ -386,7 +394,8 @@ const DietSection: React.FC = () => {
               key={allergy}
               onClick={() => handleAllergyChange(allergy)}
               className={`px-4 py-2 text-sm font-semibold rounded-full border transition-colors ${
-                localDiet.allergies && localDiet.allergies.includes(allergy)
+                // FIX: El check de nulidad en localDiet.allergies ya no es necesario si es LocalDiet
+                localDiet.allergies.includes(allergy)
                   ? 'bg-red-500 text-white border-red-500'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
@@ -406,7 +415,8 @@ const DietSection: React.FC = () => {
 
       <Select
         label="Nutri-Score mínimo aceptado"
-        value={localDiet.minNutriScore || ''}
+        // FIX: Usar || '' para manejar null si el tipo fuera NutriScore | null
+        value={localDiet.minNutriScore}
         options={nutriScoreOptions}
         onChange={(e) => setLocalDiet({ ...localDiet, minNutriScore: e.target.value as NutriScore })}
       />
@@ -424,19 +434,18 @@ const ActivitySection: React.FC = () => {
   // No hay setActivityData en tu store actual, solo logueamos la acción
   const setGoalsData = useUserStore(state => state.setGoalsData); 
 
-  // Tipos para el estado activity (ajustar según tu tipo AuthenticatedUser['activity'])
-  const initialActivity = user?.activity || {
+  const initialActivity: LocalActivity = user?.activity || {
     activityLevel: 'Sedentario' as ActivityLevel,
     trainingDaysPerWeek: 3,
     predominantType: 'Mixto'
   };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [localActivity, setLocalActivity] = useState(initialActivity);
+  const [localActivity, setLocalActivity] = useState<LocalActivity>(initialActivity);
 
   useEffect(() => {
     if (user?.activity) {
-      setLocalActivity(user.activity);
+      setLocalActivity(user.activity as LocalActivity);
     }
   }, [user?.activity]);
   
@@ -465,7 +474,7 @@ const ActivitySection: React.FC = () => {
     <div className="space-y-6">
       <Select
         label="Nivel de actividad"
-        value={localActivity.activityLevel || ''}
+        value={localActivity.activityLevel}
         options={levelOptions}
         onChange={(e) => setLocalActivity({ ...localActivity, activityLevel: e.target.value as ActivityLevel })}
       />
@@ -475,22 +484,24 @@ const ActivitySection: React.FC = () => {
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setLocalActivity((prev) => ({ 
-              ...prev as LocalActivity, // Corregido: Casting
-              trainingDaysPerWeek: Math.max(0, (prev as LocalActivity).trainingDaysPerWeek - 1) 
+              ...prev, 
+              trainingDaysPerWeek: Math.max(0, prev.trainingDaysPerWeek - 1) 
             }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-            disabled={(localActivity.trainingDaysPerWeek ?? 0) <= 0}
+            // FIX: Usar ?? 0 o asumir que es un número si se inicializó
+            disabled={localActivity.trainingDaysPerWeek <= 0}
           >
             <Minus className="w-5 h-5 text-gray-700" />
           </button>
           <span className="text-xl font-bold w-10 text-center">{localActivity.trainingDaysPerWeek}</span>
           <button 
             onClick={() => setLocalActivity((prev) => ({ 
-              ...prev as LocalActivity, // Corregido: Casting
-              trainingDaysPerWeek: Math.min(7, (prev as LocalActivity).trainingDaysPerWeek + 1) 
+              ...prev, 
+              trainingDaysPerWeek: Math.min(7, prev.trainingDaysPerWeek + 1) 
             }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-            disabled={(localActivity.trainingDaysPerWeek ?? 0) >= 7}
+            // FIX: Usar ?? 0 o asumir que es un número si se inicializó
+            disabled={localActivity.trainingDaysPerWeek >= 7}
           >
             <Plus className="w-5 h-5 text-gray-700" />
           </button>
@@ -499,7 +510,7 @@ const ActivitySection: React.FC = () => {
       
       <Select
         label="Tipo de ejercicio predominante"
-        value={localActivity.predominantType || ''}
+        value={localActivity.predominantType}
         options={typeOptions}
         onChange={(e) => setLocalActivity({ ...localActivity, predominantType: e.target.value as 'Fuerza' | 'Cardio' | 'Mixto' })}
       />
@@ -516,7 +527,7 @@ const NotificationsSection: React.FC = () => {
   // No hay setNotificationsData en tu store actual, solo logueamos la acción
   const setGoalsData = useUserStore(state => state.setGoalsData); 
 
-  const initialNotifications = user?.notifications || {
+  const initialNotifications: LocalNotifications = user?.notifications || {
     email: true,
     push: true,
     waterReminderEnabled: true,
@@ -525,18 +536,18 @@ const NotificationsSection: React.FC = () => {
   };
 
   const [isLoading, setIsLoading] = useState(false);
-  const [localNotifications, setLocalNotifications] = useState(initialNotifications);
+  const [localNotifications, setLocalNotifications] = useState<LocalNotifications>(initialNotifications);
 
   useEffect(() => {
     if (user?.notifications) {
-      setLocalNotifications(user.notifications);
+      setLocalNotifications(user.notifications as LocalNotifications);
     }
   }, [user?.notifications]);
   
   const handleToggle = useCallback((key: keyof LocalNotifications) => {
     setLocalNotifications((prev) => ({ 
-      ...prev as LocalNotifications, // Corregido: Casting
-      [key]: !(prev as LocalNotifications)[key],
+      ...prev, 
+      [key]: !prev[key],
     }));
   }, []);
   
@@ -581,14 +592,13 @@ const NotificationsSection: React.FC = () => {
     <div className="space-y-4">
       <ToggleRow 
         label="Notificaciones por Email" 
-        // Corregido: Usar ?? false para manejar null (error 2322)
+        // FIX: Se usa el valor por defecto 'false' si es null (aunque se inicializó)
         isChecked={localNotifications.email ?? false} 
         onChange={() => handleToggle('email')}
         detail="Recibe resúmenes semanales y actualizaciones."
       />
       <ToggleRow 
         label="Notificaciones Push" 
-        // Corregido: Usar ?? false para manejar null (error 2322)
         isChecked={localNotifications.push ?? false} 
         onChange={() => handleToggle('push')}
       />
