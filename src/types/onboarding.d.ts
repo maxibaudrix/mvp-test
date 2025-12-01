@@ -1,35 +1,59 @@
-/**
- * Tipos para los datos recogidos en el flujo de Onboarding (Pasos 1-3).
- */
+// src/types/onboarding.d.ts
 
-// Paso 1: Biometría
+// ============================================
+// PASO 1: BIOMETRICS
+// ============================================
 export interface BiometricsData {
-    gender: 'male' | 'female' | 'other';
-    dateOfBirth: string;
-    // Propiedades corregidas y sin duplicar
-    heightCm: number;
-    weightKg: number;
-    age: number; // Asumo que la edad se calcula en el front-end y se guarda aquí.
+  age: number;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  height: number; // cm
+  weight: number; // kg
+  bodyFatPercentage?: number; // opcional
 }
 
-// Paso 2: Objetivos y Actividad
+// ============================================
+// PASO 2: GOAL
+// ============================================
 export interface GoalData {
-    activityLevel: 'sedentary' | 'light' | 'moderate' | 'very_active' | 'extra_active';
-    // Se mantiene la nomenclatura en minúsculas para coincidir con `FitnessGoal` en calculations.ts
-    goal: 'lose_weight' | 'maintain' | 'gain_muscle';
-    targetWeightKg: number;
-    weeklyGoalKg: number;
+  goalType: 'LOSE' | 'GAIN' | 'MAINTAIN' | 'RECOMP';
+  targetWeight?: number; // kg, solo si LOSE o GAIN
+  goalSpeed?: 'SLOW' | 'MODERATE' | 'AGGRESSIVE'; // solo si no MAINTAIN
 }
 
-// Paso 3: Preferencias Dietéticas
+// ============================================
+// PASO 3-4: LIFESTYLE (Activity + Training Level)
+// ============================================
+export interface LifestyleData {
+  activityLevel: 'SEDENTARY' | 'LIGHTLY_ACTIVE' | 'MODERATELY_ACTIVE' | 'VERY_ACTIVE' | 'EXTREMELY_ACTIVE';
+  goal: 'MAINTAIN' | 'LOSE' | 'GAIN'; // Simplificado para cálculos
+  weeklyTarget?: number; // kg/semana, solo si LOSE o GAIN
+}
+
+// ============================================
+// PASO 5: DIET
+// ============================================
 export interface DietData {
-    dietType: string; // omnivore, vegetarian, vegan, keto, paleo
-    // Usamos arrays para el manejo de formularios, el backend lo convertirá a cadena
-    allergies: string[]; 
-    excludedIngredients: string[]; 
+  dietType: 'OMNIVORE' | 'VEGETARIAN' | 'VEGAN' | 'KETO' | 'PALEO';
+  allergies?: string[]; // Array de alergias
+  excludedIngredients?: string[]; // Array de ingredientes excluidos
 }
 
-/**
- * Objeto completo de los datos del Onboarding.
- */
-export type OnboardingData = BiometricsData & GoalData & DietData;
+// ============================================
+// DATOS COMPLETOS DEL ONBOARDING (Estructura Anidada)
+// ============================================
+export interface OnboardingData {
+  biometrics?: BiometricsData;
+  goal?: GoalData;
+  lifestyle?: LifestyleData;
+  diet?: DietData;
+  
+  // Macros calculados (se añaden en Step 6)
+  calculatedMacros?: {
+    bmr: number;
+    tdee: number;
+    targetCalories: number;
+    protein: number;
+    carbs: number;
+    fats: number;
+  };
+}
