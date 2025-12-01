@@ -54,14 +54,53 @@ export interface UserGoals {
 }
 
 /**
- * Extensión del tipo de usuario para incluir el perfil asociado.
+ * Tipo para la configuración de Dieta y Preferencias Alimentarias.
+ * Basado en la sección DietSection de settings/page.tsx.
+ */
+export interface UserDiet {
+  dietType: 'Omnívora' | 'Vegetariana' | 'Vegana' | 'Cetogénica' | null;
+  allergies: string[] | null; // Usamos string[] ya que se trabaja con un array de strings en el frontend.
+  maxNovaLevel: 1 | 2 | 3 | 4 | null;
+  minNutriScore: 'A' | 'B' | 'C' | 'D' | 'E' | null;
+}
+
+/**
+ * Tipo para la configuración de Nivel de Actividad y Entrenamientos.
+ * Basado en la sección ActivitySection de settings/page.tsx.
+ */
+export interface UserActivity {
+  activityLevel: 'Sedentario' | 'Ligeramente activo' | 'Moderadamente activo' | 'Muy activo' | 'Extremadamente activo' | null;
+  trainingDaysPerWeek: number | null;
+  predominantType: 'Fuerza' | 'Cardio' | 'Mixto' | null;
+}
+
+/**
+ * Tipo para la configuración de Notificaciones.
+ * Basado en la sección NotificationsSection de settings/page.tsx.
+ */
+export interface UserNotifications {
+  email: boolean | null;
+  push: boolean | null;
+  waterReminderEnabled: boolean | null;
+  waterReminderIntervalHours: number | null;
+  mealReminderEnabled: boolean | null;
+}
+
+
+/**
+ * Extensión del tipo de usuario para incluir el perfil asociado y otras configuraciones.
  */
 export interface AuthenticatedUser {
   id: string;
   email: string | undefined;
   name: string | null;
-  
-  // Relaciones (ambas existen en el modelo User de Prisma)
+
+  // Relaciones existentes
   profile: UserProfile | null;
   goals: UserGoals | null;
+  
+  // AÑADIDO: Nuevas secciones de configuración
+  diet: UserDiet | null;
+  activity: UserActivity | null;
+  notifications: UserNotifications | null;
 }

@@ -13,6 +13,48 @@ export type DietType = 'Omnívora' | 'Vegetariana' | 'Vegana' | 'Cetogénica';
 export type NovaLevel = 1 | 2 | 3 | 4;
 export type NutriScore = 'A' | 'B' | 'C' | 'D' | 'E';
 
+// src/app/settings/page.tsx
+
+// ... (línea 11, o donde termina la lista de tipos base)
+export type NutriScore = 'A' | 'B' | 'C' | 'D' | 'E';
+
+// --- INTERFACES LOCALES PARA EL ESTADO ---
+
+interface LocalProfile {
+  name: string;
+  email: string;
+  birthdate: string;
+  profileImageUrl: string;
+}
+
+interface LocalGoals {
+  currentGoal: GoalType;
+  targetWeightKg: number;
+  speed: 'Lenta' | 'Moderada' | 'Rápida';
+  calculatedMacros: { protein: number; carbs: number; fats: number };
+}
+
+interface LocalDiet {
+  dietType: DietType;
+  allergies: string[];
+  maxNovaLevel: NovaLevel;
+  minNutriScore: NutriScore;
+}
+
+interface LocalActivity {
+  activityLevel: ActivityLevel;
+  trainingDaysPerWeek: number;
+  predominantType: 'Fuerza' | 'Cardio' | 'Mixto';
+}
+
+interface LocalNotifications {
+  email: boolean;
+  push: boolean;
+  waterReminderEnabled: boolean;
+  waterReminderIntervalHours: number;
+  mealReminderEnabled: boolean;
+}
+
 // Componente utilitario de Input (Simulado)
 const Input: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label: string }> = ({ label, ...props }) => (
   <div className="space-y-1">
@@ -67,18 +109,24 @@ const ProfileSection: React.FC = () => {
   const setProfileData = useUserStore(state => state.setProfileData);
   // Simulación de estado de carga para las peticiones de guardado
   const [isLoading, setIsLoading] = useState(false);
-  const [localProfile, setLocalProfile] = useState(user?.profile || {
-    name: '',
-    email: user?.email || '', // Usar el email principal si existe
-    birthdate: '',
-    profileImageUrl: 'https://placehold.co/100x100/3b82f6/ffffff?text=U'
+  const [localProfile, setLocalProfile] = useState<LocalProfile>({
+    name: user?.profile?.name || '', // El error 2339 sugiere que 'name' es parte del mock, pero no de UserProfile. Si UserProfile usa 'firstName' y 'lastName', deberás concatenarlos aquí o usar 'name' si existe en tu modelo. Asumamos que existe, o que 'name' mapea a 'firstName'. Si tu modelo UserProfile usa `firstName` en lugar de `name`, debes cambiar la línea 118 a `firstName`.
+    email: user?.email || '',
+    birthdate: user?.profile?.birthdate || '', // Asumiendo que birthdate existe en UserProfile
+    profileImageUrl: user?.profile?.profileImageUrl || 'https://placehold.co/100x100/3b82f6/ffffff?text=U',
   });
 
   useEffect(() => {
     if (user?.profile) {
-      setLocalProfile(user.profile);
+        // Mapear el UserProfile completo a LocalProfile
+        setLocalProfile({
+            name: user.profile.name || '',
+            email: user.email || '',
+            birthdate: user.profile.birthdate || '',
+            profileImageUrl: user.profile.profileImageUrl || 'https://placehold.co/100x100/3b82f6/ffffff?text=U',
+        });
     }
-  }, [user?.profile]);
+  }, [user?.profile, user?.email]);
   
   const handleSave = async () => {
     if (!user) return;
@@ -145,11 +193,12 @@ const GoalsSection: React.FC = () => {
   const setGoalsData = useUserStore(state => state.setGoalsData);
   
   // Tipos para el estado goals (ajustar según tu tipo AuthenticatedUser['goals'])
-  const initialGoals = user?.goals || {
-    currentGoal: 'Mantenimiento' as GoalType,
-    targetWeightKg: 70,
-    speed: 'Moderada',
-    calculatedMacros: { protein: 0, carbs: 0, fats: 0 }
+  const initialGoals: LocalGoals = {
+  currentGoal: user?.goals?.currentGoal || 'Mantenimiento' as GoalType,
+  targetWeightKg: user?.goals?.targetWeightKg || 70,
+  speed: user?.goals?.speed || 'Moderada',
+  // Mapea targetMacros a calculatedMacros si es necesario, o úsalos directamente
+  calculatedMacros: user?.goals?.calculatedMacros || { protein: 0, carbs: 0, fats: 0 }
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -157,7 +206,8 @@ const GoalsSection: React.FC = () => {
 
   useEffect(() => {
     if (user?.goals) {
-      setLocalGoals(user.goals);
+        // Mapeo inverso si es necesario, o directamente:
+        setLocalGoals(user.goals as LocalGoals); 
     }
   }, [user?.goals]);
   
@@ -281,7 +331,7 @@ const DietSection: React.FC = () => {
 
   const handleAllergyChange = (allergy: string) => {
     const isPresent = localDiet.allergies.includes(allergy);
-    setLocalDiet(prev => ({
+    setLocalDiet((prev: LocalDiet) => ({
       ...prev,
       allergies: isPresent 
         ? prev.allergies.filter(a => a !== allergy)
@@ -412,7 +462,7 @@ const ActivitySection: React.FC = () => {
         <label className="text-sm font-medium text-gray-700 block mb-1">Días de entreno/semana</label>
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => setLocalActivity(prev => ({ ...prev, trainingDaysPerWeek: Math.max(0, prev.trainingDaysPerWeek - 1) }))}
+            onClick={() => setLocalActivity((prev: LocalActivity) => ({ ...prev, trainingDaysPerWeek: Math.max(0, prev.trainingDaysPerWeek - 1) }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
             disabled={localActivity.trainingDaysPerWeek <= 0}
           >
@@ -420,7 +470,7 @@ const ActivitySection: React.FC = () => {
           </button>
           <span className="text-xl font-bold w-10 text-center">{localActivity.trainingDaysPerWeek}</span>
           <button
-            onClick={() => setLocalActivity(prev => ({ ...prev, trainingDaysPerWeek: Math.min(7, prev.trainingDaysPerWeek + 1) }))}
+            onClick={() => setLocalActivity((prev: LocalActivity) => ({ ...prev, trainingDaysPerWeek: Math.min(7, prev.trainingDaysPerWeek + 1) }))}
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
             disabled={localActivity.trainingDaysPerWeek >= 7}
           >
@@ -466,7 +516,7 @@ const NotificationsSection: React.FC = () => {
   }, [user?.notifications]);
   
   const handleToggle = (key: keyof typeof initialNotifications) => {
-    setLocalNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+    setLocalNotifications((prev: LocalNotifications) => ({ ...prev, [key]: !prev[key] }));
   };
   
   const handleSave = async () => {
