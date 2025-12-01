@@ -3,12 +3,13 @@
 // NOTA: En un entorno real (ej. API Route), 
 // se debería importar el cliente de Prisma:
 import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient(); 
+// Se ha comentado la inicialización real para evitar el error TS2451.
+// const prisma = new PrismaClient(); 
 
 // Para simular la inyección de Prisma en este entorno aislado,
-// definiremos el tipo genérico de Prisma.
+// definiremos el tipo genérico de Prisma y lo asignaremos al mock.
 type PrismaClientMock = any; 
-const prisma: PrismaClientMock = {}; // Debe ser inyectado/inicializado en la aplicación real.
+const prisma: PrismaClientMock = {}; // Esta es la única declaración activa de 'prisma'.
 
 
 // --- Tipos de Datos (Basados en el Schema.prisma proporcionado) ---
@@ -25,14 +26,14 @@ export interface UserGoalsData {
   targetMacros: { protein: number; carbs: number; fats: number };
 }
 
-export interface RecipeSummary {
+export interface RecipeSummary { // Exportado
   recipeId: string;
   name: string;
   macros: { protein: number; carbs: number; fats: number };
   calories: number;
 }
 
-export interface MealPlanEntry {
+export interface MealPlanEntry { // Exportado
   date: string; // YYYY-MM-DD
   day: string; // Ej: "Lunes"
   meals: {
@@ -43,13 +44,15 @@ export interface MealPlanEntry {
   };
 }
 
+export interface WeeklyStats { // ¡Exportado ahora para que el store lo importe!
+  avgCalories: number;
+  avgMacros: { protein: number; carbs: number; fats: number };
+}
+
 export interface WeeklyPlan {
   week: string;
   plan: MealPlanEntry[];
-  weeklyStats: {
-    avgCalories: number;
-    avgMacros: { protein: number; carbs: number; fats: number };
-  };
+  weeklyStats: WeeklyStats; // Referencia al nuevo tipo exportado
 }
 
 
@@ -157,13 +160,15 @@ function balanceWeeklyMacros(recipes: RecipeSummary[], goals: UserGoalsData, wee
   }
 
   // Las estadísticas se calculan a partir del mockPlan
+  const weeklyStats: WeeklyStats = {
+    avgCalories: goals.targetCalories + 150,
+    avgMacros: { protein: goals.targetMacros.protein + 20, carbs: goals.targetMacros.carbs - 30, fats: goals.targetMacros.fats + 10 }
+  };
+  
   return {
     week: week,
     plan: mockPlan,
-    weeklyStats: {
-      avgCalories: goals.targetCalories + 150,
-      avgMacros: { protein: goals.targetMacros.protein + 20, carbs: goals.targetMacros.carbs - 30, fats: goals.targetMacros.fats + 10 }
-    }
+    weeklyStats: weeklyStats,
   };
 }
 
