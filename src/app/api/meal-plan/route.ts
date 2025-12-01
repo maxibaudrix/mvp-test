@@ -96,14 +96,14 @@ export async function POST(req: NextRequest) {
                 userId_week: { userId, week }
             },
             update: {
-                planJson: newPlan.plan,
-                statsJson: newPlan.weeklyStats,
+                planJson: JSON.stringify(newPlan.plan),
+                statsJson: JSON.stringify(newPlan.weeklyStats),
             },
             create: {
                 userId,
                 week,
-                planJson: newPlan.plan,
-                statsJson: newPlan.weeklyStats,
+                planJson: JSON.stringify(newPlan.plan),
+                statsJson: JSON.stringify(newPlan.weeklyStats),
             },
             select: {
                 week: true,
