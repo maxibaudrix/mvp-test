@@ -94,6 +94,7 @@ export interface AuthenticatedUser {
   id: string;
   email: string | undefined;
   name: string | null;
+  image: string | null;
 
   // Relaciones existentes
   profile: UserProfile | null;
