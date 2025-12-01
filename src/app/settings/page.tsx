@@ -1,4 +1,5 @@
 // src/app/settings/page.tsx
+"use client";
 import React, { useState, useEffect, useCallback } from 'react';
 // Corregido: Usando importación relativa en lugar de la ruta alias '@/store/user'
 import { useUserStore } from '../../store/user'; 
