@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
 // PATCH /api/shopping/item/[id] (Marcar como comprado)
 // Se implementa con un solo handler PATCH que delega.
 // ----------------------------------------------------
-export async function PATCH_ITEM(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
     const userId = getUserIdFromSession(req);
     if (!userId) return handleUnauthorized();
     
