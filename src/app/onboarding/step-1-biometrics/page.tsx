@@ -1,4 +1,3 @@
-// src/app/onboarding/step-1-biometrics/page.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -8,6 +7,7 @@ import StepButtons from '@/components/onboarding/StepButtons';
 import { useOnboardingForm, biometricsSchema } from '@/hooks/useOnboardingForm';
 import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
+import { useOnboardingStore } from '@/store/onboarding';   
 
 const NEXT_PATH = '/onboarding/step-2-goal';
 const PREV_PATH = '/login';
@@ -15,12 +15,23 @@ const PREV_PATH = '/login';
 export default function Step1BiometricsPage() {
   const router = useRouter();
 
+  const { setBiometrics } = useOnboardingStore();   
+
   const {
     register,
     handleSubmitStore,
     formState: { errors, isSubmitting },
     watch,
-  } = useOnboardingForm(1, biometricsSchema, () => {
+  } = useOnboardingForm(1, biometricsSchema, (formData) => {
+    // ✅ Nuevo callback con guardado en Zustand
+    setBiometrics({
+      age: formData.age,
+      gender: formData.gender,
+      height: formData.height,
+      weight: formData.weight,
+      bodyFatPercentage: formData.bodyFatPercentage,
+    });
+
     router.push(NEXT_PATH);
   });
 
@@ -36,9 +47,10 @@ export default function Step1BiometricsPage() {
             title="Datos Biométricos"
             description="Cuéntanos sobre tu cuerpo para personalizar tu plan"
           />
-          
+
           <CardContent>
             <form onSubmit={handleSubmitStore} className="space-y-6">
+
               {/* Edad */}
               <div>
                 <Label htmlFor="age">Edad (años)</Label>
