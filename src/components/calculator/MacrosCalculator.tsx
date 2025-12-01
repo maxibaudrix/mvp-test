@@ -5,6 +5,7 @@ import { useOnboardingStore } from '@/store/onboarding';
 import { calculateTDEE } from '@/lib/calculations/tdee';
 import { calculateMacros } from '@/lib/calculations/macros';
 import type { OnboardingData } from '@/types/onboarding';
+import { BiometricsData } from '@/types/onboarding'; // Asumimos que BiometricsData está disponible
 
 // Mapeo perfecto de tus valores del formulario → valores que espera calculateTDEE
 const ACTIVITY_LEVEL_MAP = {
@@ -33,27 +34,33 @@ const MacroItem = ({ label, grams, percentage }: MacroItemProps) => (
 
 export const MacrosCalculator = () => {
   const { data } = useOnboardingStore();
-  const fullData = data as OnboardingData;
+  // El casting es necesario aquí si useOnboardingStore retorna 'any' o un tipo parcial.
+  const fullData = data as OnboardingData; 
+
+  const biometrics = fullData.biometrics as BiometricsData | undefined;
+  const lifestyle = fullData.lifestyle;
 
   // Validación completa
   if (
-    !fullData?.goal ||
-    fullData.weeklyGoalKg === undefined ||
-    !fullData.heightCm ||
-    !fullData.weightKg ||
-    !fullData.age ||
-    !fullData.gender ||
-    !fullData.activityLevel ||
-    !fullData.dateOfBirth
+    // weeklyTarget existe en lifestyleSchema
+    lifestyle?.weeklyTarget === undefined || 
+    !biometrics?.height ||
+    !biometrics?.weight || 
+    !biometrics?.age || 
+    !biometrics?.gender || 
+    !lifestyle?.activityLevel ||
+    !biometrics?.dateOfBirth // Aseguramos que dateOfBirth esté presente para TDEE
   ) {
     return <p className="text-slate-400">Faltan datos para calcular los macros.</p>;
   }
 
-  // Normalización del activityLevel
-  const normalizedActivityLevel = ACTIVITY_LEVEL_MAP[fullData.activityLevel];
+  // Normalización del activityLevel (El índice es el valor en minúsculas)
+  // FIX 1: Se usa la clave en minúsculas 'sedentary' como fallback, si fuera necesario, 
+  // pero la validación previa debería garantizar que no es necesario el fallback.
+  const normalizedActivityLevel = ACTIVITY_LEVEL_MAP[lifestyle.activityLevel as keyof typeof ACTIVITY_LEVEL_MAP];
   
   // Fallback seguro (nunca debería pasar)
-  const safeActivityLevel = normalizedActivityLevel || 'SEDENTARY';
+  const safeActivityLevel = normalizedActivityLevel || ACTIVITY_LEVEL_MAP.sedentary; 
 
   // Normalización del goal
   const goalMap: Record<string, 'LOSE_WEIGHT' | 'MAINTAIN' | 'GAIN_MUSCLE'> = {
@@ -61,16 +68,18 @@ export const MacrosCalculator = () => {
     maintain: 'MAINTAIN',
     gain_muscle: 'GAIN_MUSCLE',
   };
-  const safeGoal = goalMap[fullData.goal] || 'MAINTAIN';
+  const safeGoal = goalMap[lifestyle.goal] || 'MAINTAIN';
 
   // Cálculo del TDEE con datos normalizados
+  // FIX 2: Pasamos todas las propiedades requeridas por calculateTDEE (incluyendo dateOfBirth).
   const tdee = calculateTDEE({
-    ...fullData,
+    ...biometrics,
     activityLevel: safeActivityLevel,
+    dateOfBirth: biometrics.dateOfBirth, // Añadido para satisfacer el tipo requerido
   });
 
   // Macros
-  const macros = calculateMacros(tdee, safeGoal, fullData.weeklyGoalKg);
+  const macros = calculateMacros(tdee, safeGoal, lifestyle.weeklyTarget);
   const targetCalories = macros.protein * 4 + macros.carbs * 4 + macros.fat * 9;
 
   const goalText =
@@ -83,7 +92,8 @@ export const MacrosCalculator = () => {
       <CardHeader>
         <CardTitle className="text-xl">Objetivo de Macronutrientes</CardTitle>
         <CardDescription>
-          Distribución óptima para {goalText} • {Math.abs(fullData.weeklyGoalKg)} kg/semana
+          {/* FIX 3: Cambiado de weeklyGoalKg a lifestyle.weeklyTarget */}
+          Distribución óptima para {goalText} • {Math.abs(lifestyle.weeklyTarget)} kg/semana
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
