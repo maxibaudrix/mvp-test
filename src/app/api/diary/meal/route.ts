@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 // Importa tu instancia de Prisma (asumiendo que está en lib/prisma)
-// import prisma from '@/lib/prisma'; 
+import prisma from '@/lib/prisma'; 
 
 // Esquema de validación para el query parameter 'date'
 const dateQuerySchema = z.object({

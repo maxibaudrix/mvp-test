@@ -1,7 +1,7 @@
 // src/app/api/diary/exercise/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { updateExerciseSchema } from '@/lib/validations/diary'; // Importar esquema Zod
-// import prisma from '@/lib/prisma'; // Importa tu instancia de Prisma
+import prisma from '@/lib/prisma'; // Importa tu instancia de Prisma
 
 interface Context {
   params: {

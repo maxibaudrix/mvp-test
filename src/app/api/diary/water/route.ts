@@ -1,7 +1,7 @@
 // src/app/api/diary/water/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { addWaterSchema } from '@/lib/validations/diary'; // Importar esquema Zod
-// import prisma from '@/lib/prisma'; // Importa tu instancia de Prisma
+import prisma from '@/lib/prisma'; // Importa tu instancia de Prisma
 
 /**
  * POST /api/diary/water
