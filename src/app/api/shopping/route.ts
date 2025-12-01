@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
 // ----------------------------------------------------
 // POST /api/shopping/add (Añadir ítem manual)
 // ----------------------------------------------------
-export async function POST_ADD(req: NextRequest) {
+export async function POST(req: NextRequest) {
     // Este endpoint debe ser una función separada en Next.js (por convención),
     // pero aquí lo incluimos con el nombre del path.
     const userId = getUserIdFromSession(req);
