@@ -21,7 +21,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 // Carga el plan de comidas guardado para una semana específica.
 // ----------------------------------------------------
 export async function GET(req: NextRequest) {
-    const userId = getUserIdFromSession(req);
+    const userId = await getUserIdFromSession(req);
     if (!userId) return handleUnauthorized();
 
     const searchParams = req.nextUrl.searchParams;
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
 // Genera y guarda un nuevo plan de comidas automático (UPSERT).
 // ----------------------------------------------------
 export async function POST(req: NextRequest) {
-    const userId = getUserIdFromSession(req);
+    const userId = await getUserIdFromSession(req);
     if (!userId) return handleUnauthorized();
 
     try {
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
 // Asigna una receta a un slot específico (actualiza el campo JSON).
 // ----------------------------------------------------
 export async function PATCH(req: NextRequest) {
-    const userId = getUserIdFromSession(req);
+    const userId = await getUserIdFromSession(req);
     if (!userId) return handleUnauthorized();
 
     try {
@@ -223,7 +223,7 @@ export async function PATCH(req: NextRequest) {
 // Elimina una receta de un slot específico (lo establece a null).
 // ----------------------------------------------------
 export async function DELETE(req: NextRequest) {
-    const userId = getUserIdFromSession(req);
+    const userId = await getUserIdFromSession(req);
     if (!userId) return handleUnauthorized();
 
     try {
