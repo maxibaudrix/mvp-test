@@ -9,6 +9,7 @@ import { useOnboardingForm, goalSchema } from '@/hooks/useOnboardingForm';
 import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
 import { TrendingDown, TrendingUp, Minus, Zap } from 'lucide-react';
+import { useOnboardingStore } from '@/store/onboarding';   
 
 const NEXT_PATH = '/onboarding/step-3-activity';
 const PREV_PATH = '/onboarding/step-1-biometrics';
@@ -23,12 +24,20 @@ const GOAL_OPTIONS = [
 export default function Step2GoalPage() {
   const router = useRouter();
 
+  const { setGoal } = useOnboardingStore();   
+
   const {
     register,
     handleSubmitStore,
     formState: { errors, isSubmitting },
     watch,
-  } = useOnboardingForm(2, goalSchema, () => {
+  } = useOnboardingForm(2, goalSchema, (formData) => {
+    // ✅ Callback corregido para guardar el objetivo en Zustand
+    setGoal({
+      goalType: formData.goalType,
+      targetWeight: formData.targetWeight,
+      goalSpeed: formData.goalSpeed,
+    });
     router.push(NEXT_PATH);
   });
 
