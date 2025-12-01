@@ -224,7 +224,7 @@ export default function ProgressPage() {
               // Se usa un casting temporal para asegurar que TS sepa qué propiedades buscar en las mediciones mock
               const current = lastMeasurements ? lastMeasurements[key as keyof MeasurementEntry] : 0;
               const initial = initialMeasurements ? initialMeasurements[key as keyof MeasurementEntry] : 0;
-              const diff = parseFloat(getMeasurementDiff(key as 'waist' | 'chest' | 'hips' | 'bicep'));
+              const diff = parseFloat(String(getMeasurementDiff(key as 'waist' | 'chest' | 'hips' | 'bicep')));
               const isPositive = diff >= 0; 
               
               return (
