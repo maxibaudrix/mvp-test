@@ -335,13 +335,15 @@ const DietSection: React.FC = () => {
 
   useEffect(() => {
     if (user?.diet) {
-      setLocalDiet(user.diet);
+      // FIX: Mapeo explícito y uso de ?? para evitar null (Error 2345/2322)
+      setLocalDiet({
+        dietType: user.diet.dietType ?? 'Omnívora',
+        allergies: user.diet.allergies ?? [],
+        maxNovaLevel: user.diet.maxNovaLevel ?? 4,
+        minNutriScore: user.diet.minNutriScore ?? 'E',
+      });
     }
   }, [user?.diet]);
-  
-  const dietOptions: DietType[] = ['Omnívora', 'Vegetariana', 'Vegana', 'Cetogénica'];
-  const nutriScoreOptions: NutriScore[] = ['A', 'B', 'C', 'D', 'E'];
-  const novaOptions = [1, 2, 3, 4].map(n => `Máximo nivel ${n}`);
 
   // FIX: Se cerró correctamente la función handleAllergyChange
   const handleAllergyChange = (allergy: string) => {
@@ -434,11 +436,16 @@ const ActivitySection: React.FC = () => {
   // No hay setActivityData en tu store actual, solo logueamos la acción
   const setGoalsData = useUserStore(state => state.setGoalsData); 
 
-  const initialActivity: LocalActivity = user?.activity || {
-    activityLevel: 'Sedentario' as ActivityLevel,
-    trainingDaysPerWeek: 3,
-    predominantType: 'Mixto'
-  };
+  useEffect(() => {
+    if (user?.activity) {
+      // FIX: Mapeo explícito y uso de ?? para evitar null (Error 2322)
+      setLocalActivity({
+        activityLevel: user.activity.activityLevel ?? 'Sedentario',
+        trainingDaysPerWeek: user.activity.trainingDaysPerWeek ?? 3,
+        predominantType: user.activity.predominantType ?? 'Mixto',
+      });
+    }
+  }, [user?.activity]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [localActivity, setLocalActivity] = useState<LocalActivity>(initialActivity);
@@ -527,13 +534,18 @@ const NotificationsSection: React.FC = () => {
   // No hay setNotificationsData en tu store actual, solo logueamos la acción
   const setGoalsData = useUserStore(state => state.setGoalsData); 
 
-  const initialNotifications: LocalNotifications = user?.notifications || {
-    email: true,
-    push: true,
-    waterReminderEnabled: true,
-    waterReminderIntervalHours: 2,
-    mealReminderEnabled: true,
-  };
+  useEffect(() => {
+    if (user?.notifications) {
+      // FIX: Mapeo explícito y uso de ?? para evitar null (Error 2322)
+      setLocalNotifications({
+        email: user.notifications.email ?? true,
+        push: user.notifications.push ?? true,
+        waterReminderEnabled: user.notifications.waterReminderEnabled ?? true,
+        waterReminderIntervalHours: user.notifications.waterReminderIntervalHours ?? 2,
+        mealReminderEnabled: user.notifications.mealReminderEnabled ?? true,
+      });
+    }
+  }, [user?.notifications]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [localNotifications, setLocalNotifications] = useState<LocalNotifications>(initialNotifications);
