@@ -1,7 +1,7 @@
 // src/components/dashboard/RecentScans.tsx
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScanBarcode } from 'lucide-react';
+import { Scan } from 'lucide-react';
 
 // Mock types si no existen los de scanner
 interface ScannedItem {
@@ -20,7 +20,7 @@ export const RecentScans: React.FC<RecentScansProps> = ({ scans = [] }) => {
     <Card className="shadow-md">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
-            <ScanBarcode className="text-purple-600" size={20} />
+            <Scan className="text-purple-600" size={20} />
             Escaneos Recientes
         </CardTitle>
       </CardHeader>
