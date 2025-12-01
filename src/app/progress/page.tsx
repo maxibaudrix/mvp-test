@@ -154,7 +154,7 @@ export default function ProgressPage() {
             {/* Adherencia */}
             <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-800 space-y-4">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Rings className="w-5 h-5 text-pink-400" />
+                    
                     Adherencia y Consistencia
                 </h3>
                 <div className="text-4xl font-extrabold text-pink-400">{adherencePercentage}%</div>

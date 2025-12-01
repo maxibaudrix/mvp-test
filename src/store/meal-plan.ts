@@ -159,4 +159,5 @@ export const useMealPlanStore = create<MealPlanState>((set, get) => ({
             set({ error: 'Fallo al actualizar la receta: ' + err.message }); 
         }
     }
+    
 }));
