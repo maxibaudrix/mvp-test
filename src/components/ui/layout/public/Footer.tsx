@@ -8,7 +8,7 @@ const SocialIcon = ({ children, href }: { children: React.ReactNode, href: strin
     </a>
 );
 
-export const PublicFooter = () => {
+export const Footer = () => {
   return (
     <footer className="bg-slate-950 border-t border-slate-800 py-12 px-4 sm:px-6">
       <div className="container mx-auto">
@@ -101,3 +101,4 @@ export const PublicFooter = () => {
     </footer>
   );
 };
+export default Footer;

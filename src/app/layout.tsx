@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 // NOTA: Asumiendo que PublicHeader y PublicFooter están tipados en sus archivos originales
-import { PublicHeader } from '@/components/ui/layout/public/Header';
-import { PublicFooter } from '@/components/ui/layout/public/Footer';
+import { Header } from '@/components/ui/layout/public/Header';
+import { Footer } from '@/components/ui/layout/public/Footer';
 
 // Define la fuente Inter
 const inter = Inter({ subsets: ['latin'] });
@@ -38,12 +38,12 @@ interface PublicLayoutProps {
 export function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <>
-      <PublicHeader />
+      <Header />
       {/* Contenido principal con padding para que el header fijo no lo cubra */}
       <main className="min-h-[calc(100vh-64px-64px)]"> 
         {children}
       </main>
-      <PublicFooter />
+      <Footer />
     </>
   );
 }

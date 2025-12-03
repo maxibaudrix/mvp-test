@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Menu, X, Dumbbell } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 
-export const PublicHeader = () => {
+export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -99,3 +99,4 @@ export const PublicHeader = () => {
     </header>
   );
 };
+export default Header;
