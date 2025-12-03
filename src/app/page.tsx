@@ -544,7 +544,7 @@ const SporvitLanding = () => {
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-400 text-sm">
-              © 2024 Sporvit. Todos los derechos reservados.
+              © 2025 Sporvit. Todos los derechos reservados.
             </p>
             <div className="flex items-center space-x-6">
               <a href="#" className="text-slate-400 hover:text-emerald-400 transition-colors">
