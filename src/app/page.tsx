@@ -3,6 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Camera, Dumbbell, Brain, ChevronRight, Check, Menu, X, Star, TrendingUp, Zap, Target, Calendar, BarChart3, Award, Users, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const SporvitLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -163,10 +165,12 @@ const SporvitLanding = () => {
               <a href="#how-it-works" className="text-slate-300 hover:text-emerald-400 transition-colors">Cómo funciona</a>
               <a href="#pricing" className="text-slate-300 hover:text-emerald-400 transition-colors">Precios</a>
               <a href="/calculators" className="text-slate-300 hover:text-emerald-400 transition-colors">Calculadoras</a>
-              <a href="/login" className="text-slate-300 hover:text-emerald-400 transition-colors">Login</a>
-              <PrimaryButton href="/register" large={false} className="px-6 py-2.5" // Puedes pasar clases extra para ajustar el padding si es necesario>
-                Empezar Gratis
-              </PrimaryButton>
+              <Link href="/login" className="text-slate-300 hover:text-primary transition-colors">Login</Link>
+              <Button asChild size="sm">
+                <Link href="/register">
+                  Empezar Gratis
+                </Link>
+              </Button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -225,10 +229,16 @@ const SporvitLanding = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-emerald-500/50 transition-all transform hover:scale-105 flex items-center justify-center space-x-2">
-              <span>Empezar Gratis</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            <Button 
+              asChild 
+              size="lg" 
+              className="bg-cta-gradient w-full sm:w-auto hover:shadow-primary/50" 
+            >
+              <Link href="/register">
+                Empezar Gratis
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </Button>
             <button className="w-full sm:w-auto px-8 py-4 bg-slate-800/50 border border-slate-700 rounded-full font-semibold text-lg hover:bg-slate-800 transition-all backdrop-blur-sm">
               Ver Demo (2 min)
             </button>
