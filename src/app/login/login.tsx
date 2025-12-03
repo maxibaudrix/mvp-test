@@ -1,4 +1,5 @@
 // src/app/pages/login.tsx
+'use client';
 import React, { useState } from 'react';
 import {
     Mail,
