@@ -29,32 +29,35 @@ export interface BlogPost {
     linkedin?: string;
   };
 };
+};
 
+// --- Funciones del CMS ---
 
+export async function getFeaturedPost(): Promise<BlogPost> {
+  await new Promise(resolve => setTimeout(resolve, 100));
+  return DUMMY_POSTS[0];
 }
-/**
- * Obtiene un único post por su slug.
- */
+
+export async function getBlogPosts(category?: string): Promise<BlogPost[]> {
+  await new Promise(resolve => setTimeout(resolve, 100));
+  return category
+    ? DUMMY_POSTS.filter(post => post.category === category)
+    : DUMMY_POSTS;
+}
+
 export async function getBlogPost(slug: string): Promise<BlogPost | null> {
   await new Promise(resolve => setTimeout(resolve, 100));
-
   return DUMMY_POSTS.find(post => post.slug === slug) || null;
 }
 
-/**
- * Obtiene posts relacionados por categoría (máx 3).
- */
 export async function getRelatedPosts(slug: string): Promise<BlogPost[]> {
   await new Promise(resolve => setTimeout(resolve, 100));
-
-  const post = DUMMY_POSTS.find(p => p.slug === slug);
-  if (!post) return [];
-
+  const current = DUMMY_POSTS.find(p => p.slug === slug);
+  if (!current) return [];
   return DUMMY_POSTS
-    .filter(p => p.slug !== slug && p.category === post.category)
+    .filter(p => p.slug !== slug && p.category === current.category)
     .slice(0, 3);
 }
-
 
 const DUMMY_POSTS: BlogPost[] = [
   {
