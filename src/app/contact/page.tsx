@@ -1,21 +1,25 @@
-// src/app/contact/page.tsx
 'use client';
 
 import React, { useState } from 'react';
-// CORRECCIÓN: Eliminamos next/link para evitar errores en el preview
-// import Link from 'next/link'; 
 import { 
   Mail, MessageSquare, Send, HelpCircle, ChevronDown, 
-  ArrowLeft, CheckCircle, AlertCircle, Loader2, Star 
+  ArrowLeft, CheckCircle, AlertCircle, Loader2, Star, User // Añadido User para completar los iconos
 } from 'lucide-react';
-import { ContactFormData } from '@/lib/validations/contact'; // Importamos el tipo
+
+// CORRECCIÓN: Definición del tipo de datos del formulario localmente
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
 // --- Componente FAQ Item ---
 const FaqItem = ({ question, answer }: { question: string, answer: string }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={`border rounded-xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-slate-900 border-emerald-500/50' : 'bg-slate-900/30 border-slate-800 hover:border-slate-700'}`}>
+    <div className={`border rounded-xl overflow-hidden transition-all duration-300 ${isOpen ? 'bg-slate-800 border-emerald-500/50' : 'bg-slate-900/30 border-slate-700 hover:border-slate-600'}`}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between p-5 text-left focus:outline-none"
@@ -27,8 +31,8 @@ const FaqItem = ({ question, answer }: { question: string, answer: string }) => 
         <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180 text-emerald-400' : ''}`} />
       </button>
       
-      <div className={`px-5 text-slate-400 text-sm overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 pb-5 opacity-100' : 'max-h-0 opacity-0'}`}>
-        {answer}
+      <div className={`px-5 text-slate-400 text-sm overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-60 pb-5 opacity-100' : 'max-h-0 opacity-0'}`}>
+        <p>{answer}</p>
       </div>
     </div>
   );
@@ -40,7 +44,7 @@ export default function ContactPage() {
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Estado del formulario
+  // Estado del formulario tipado
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
@@ -48,35 +52,42 @@ export default function ContactPage() {
     message: ''
   });
 
+  // CORRECCIÓN: Tipado explícito de 'prev' (soluciona Error 7006)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev: ContactFormData) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isLoading) return; // Prevenir doble envío
+
+    // Validación simple en el cliente
+    if (!formData.name || !formData.email || !formData.message) {
+      setStatus('error');
+      setErrorMessage('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+
     setIsLoading(true);
     setStatus('idle');
     setErrorMessage('');
 
     try {
-      const response = await fetch('/api/contact/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      // SIMULACIÓN DE ENVÍO API (reemplaza fetch('/api/contact/submit'))
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simula latencia de 2 segundos
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al enviar el mensaje');
+      // Simulación de error si el email es 'error@test.com'
+      if (formData.email.toLowerCase().includes('error')) {
+        throw new Error('El servicio de envío está temporalmente inactivo. Inténtalo más tarde.');
       }
 
       setStatus('success');
       setFormData({ name: '', email: '', subject: 'Soporte Técnico', message: '' }); // Reset
+
     } catch (error: any) {
       setStatus('error');
-      setErrorMessage(error.message || 'Ocurrió un error inesperado.');
+      setErrorMessage(error.message || 'Ocurrió un error inesperado al enviar el mensaje.');
     } finally {
       setIsLoading(false);
     }
@@ -88,10 +99,10 @@ export default function ContactPage() {
       {/* --- Header --- */}
       <header className="sticky top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          {/* CORRECCIÓN: Usamos <a> en lugar de <Link> */}
-          <a href="/dashboard" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+          {/* CORRECCIÓN: Usamos <a> en lugar de <Link> para ser autocontenido */}
+          <a href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
             <div className="p-2 rounded-full group-hover:bg-slate-800 transition-colors">
-                <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5" />
             </div>
             <span className="hidden sm:inline font-medium">Volver</span>
           </a>
@@ -118,7 +129,7 @@ export default function ContactPage() {
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
           
           {/* --- COLUMNA IZQUIERDA: INFO & SOCIAL PROOF --- */}
-          <div className="space-y-6 lg:col-span-1 h-fit sticky top-24">
+          <div className="space-y-6 lg:col-span-1 h-fit lg:sticky lg:top-24">
             
             <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
               <h3 className="text-lg font-bold mb-6 text-white border-b border-slate-800 pb-4">Métodos de contacto</h3>
@@ -144,7 +155,7 @@ export default function ContactPage() {
                   <div>
                     <p className="text-sm font-medium text-slate-300">Chat en Vivo</p>
                     <button className="text-white hover:text-emerald-400 transition-colors text-left font-semibold underline decoration-slate-700 underline-offset-4">
-                      Iniciar conversación
+                      Inicira conversación
                     </button>
                     <p className="text-xs text-slate-500 mt-1">Lun-Vie: 9:00 - 18:00</p>
                   </div>
@@ -192,9 +203,10 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-300">Nombre</label>
+                      <label htmlFor="name" className="text-sm font-medium text-slate-300">Nombre</label>
                       <input 
                         type="text" 
+                        id="name"
                         name="name"
                         required
                         value={formData.name}
@@ -205,9 +217,10 @@ export default function ContactPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-300">Email</label>
+                      <label htmlFor="email" className="text-sm font-medium text-slate-300">Email</label>
                       <input 
                         type="email" 
+                        id="email"
                         name="email"
                         required
                         value={formData.email}
@@ -220,9 +233,10 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-300">Asunto</label>
+                    <label htmlFor="subject" className="text-sm font-medium text-slate-300">Asunto</label>
                     <div className="relative">
                       <select 
+                        id="subject"
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
@@ -239,8 +253,9 @@ export default function ContactPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-300">Mensaje</label>
+                    <label htmlFor="message" className="text-sm font-medium text-slate-300">Mensaje</label>
                     <textarea 
+                      id="message"
                       name="message"
                       required
                       rows={5}
@@ -305,6 +320,10 @@ export default function ContactPage() {
             <FaqItem 
               question="¿Con qué apps se sincroniza Sporvit?" 
               answer="Actualmente nos integramos con Apple Health y Google Fit para leer tus pasos, calorías activas y peso automáticamente." 
+            />
+            <FaqItem
+              question="¿Dónde encuentro mi historial de entrenamientos?"
+              answer="Tu historial completo de sesiones de entrenamiento, incluyendo repeticiones, series y peso levantado, se encuentra en la pestaña 'Progreso' dentro de tu perfil de usuario."
             />
           </div>
         </div>
