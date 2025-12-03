@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+// NOTA: Asumiendo que PublicHeader y PublicFooter están tipados en sus archivos originales
+import { PublicHeader } from '@/components/ui/layout/public/Header';
+import { PublicFooter } from '@/components/ui/layout/public/Footer';
 
+// Define la fuente Inter
 const inter = Inter({ subsets: ['latin'] });
 
+// 1. Metadatos (ya correctamente definidos)
 export const metadata: Metadata = {
   title: {
     template: '%s | Web App',
@@ -20,6 +25,30 @@ export const metadata: Metadata = {
   },
 };
 
+// 2. Definición del PublicLayout (como un componente simple)
+// NOTA: En la estructura de Next.js 13/14, si este es un layout anidado,
+// se define como una función exportada por defecto. Aquí lo definimos como un componente.
+// He asumido que quieres que sea el layout principal (RootLayout) con el header y footer.
+
+interface PublicLayoutProps {
+  children: React.ReactNode;
+}
+
+// Renombramos el export default original a RootLayout para mantener la convención de Next.js
+export function PublicLayout({ children }: PublicLayoutProps) {
+  return (
+    <>
+      <PublicHeader />
+      {/* Contenido principal con padding para que el header fijo no lo cubra */}
+      <main className="min-h-[calc(100vh-64px-64px)]"> 
+        {children}
+      </main>
+      <PublicFooter />
+    </>
+  );
+}
+
+// 3. RootLayout que envuelve la estructura HTML básica
 export default function RootLayout({
   children,
 }: {
@@ -28,7 +57,10 @@ export default function RootLayout({
   return (
     <html lang="es" className="scroll-smooth">
       <body className={`${inter.className} bg-slate-950 text-white antialiased min-h-screen selection:bg-emerald-500/30 selection:text-emerald-200`}>
-        {children}
+        {/* Aquí renderizamos el layout con Header/Footer */}
+        <PublicLayout>
+          {children}
+        </PublicLayout>
       </body>
     </html>
   );
