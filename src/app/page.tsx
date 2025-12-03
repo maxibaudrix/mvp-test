@@ -1,9 +1,7 @@
-// src/app/page  
-"use client";
-
+// src/app/progress/page  
+'use client'
 import React, { useState, useEffect } from 'react';
 import { Camera, Dumbbell, Brain, ChevronRight, Check, Menu, X, Star, TrendingUp, Zap, Target, Calendar, BarChart3, Award, Users, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const SporvitLanding = () => {
@@ -165,20 +163,10 @@ const SporvitLanding = () => {
               <a href="#how-it-works" className="text-slate-300 hover:text-emerald-400 transition-colors">Cómo funciona</a>
               <a href="#pricing" className="text-slate-300 hover:text-emerald-400 transition-colors">Precios</a>
               <a href="/calculators" className="text-slate-300 hover:text-emerald-400 transition-colors">Calculadoras</a>
-              <div className="flex items-center gap-4">
-                <Link 
-                  href="/login" 
-                  className="text-slate-300 hover:text-primary transition-colors font-medium"
-                >
-                  Login
-                </Link>
-                <Button asChild size="sm">
-                  <Link href="/register" className="flex items-center gap-2 group">
-                    Empezar Gratis
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </div>
+              <Link href="/login" className="text-slate-300 hover:text-emerald-400 transition-colors">Login </Link>
+              <button className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105">
+                Empezar Gratis
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -237,15 +225,10 @@ const SporvitLanding = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Button asChild size="lg">
-              <Link 
-                href="/register" 
-                className="flex items-center justify-center gap-3 w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 px-10 py-7 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 group"
-              >
-                Empezar Gratis
-                <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-2" />
-              </Link>
-            </Button>
+            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-emerald-500/50 transition-all transform hover:scale-105 flex items-center justify-center space-x-2">
+              <span>Empezar Gratis</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
             <button className="w-full sm:w-auto px-8 py-4 bg-slate-800/50 border border-slate-700 rounded-full font-semibold text-lg hover:bg-slate-800 transition-all backdrop-blur-sm">
               Ver Demo (2 min)
             </button>
