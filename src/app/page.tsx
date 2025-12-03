@@ -1,4 +1,4 @@
-// src/app/progress/page  
+// src/app/page  
 'use client'
 import React, { useState, useEffect } from 'react';
 import { Camera, Dumbbell, Brain, ChevronRight, Check, Menu, X, Star, TrendingUp, Zap, Target, Calendar, BarChart3, Award, Users, ArrowRight } from 'lucide-react';
@@ -164,9 +164,12 @@ const SporvitLanding = () => {
               <a href="#pricing" className="text-slate-300 hover:text-emerald-400 transition-colors">Precios</a>
               <a href="/calculators" className="text-slate-300 hover:text-emerald-400 transition-colors">Calculadoras</a>
               <Link href="/login" className="text-slate-300 hover:text-emerald-400 transition-colors">Login </Link>
-              <button className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105">
+              <Link 
+                href="/register" 
+                className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105 inline-flex items-center justify-center text-white"
+              >
                 Empezar Gratis
-              </button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
