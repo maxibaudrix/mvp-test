@@ -228,10 +228,12 @@ const SporvitLanding = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-emerald-500/50 transition-all transform hover:scale-105 flex items-center justify-center space-x-2">
-              <span>Empezar Gratis</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            <Link 
+                href="/register" 
+                className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105 inline-flex items-center justify-center text-white"
+              >
+                Empezar Gratis
+              </Link>
             <button className="w-full sm:w-auto px-8 py-4 bg-slate-800/50 border border-slate-700 rounded-full font-semibold text-lg hover:bg-slate-800 transition-all backdrop-blur-sm">
               Ver Demo (2 min)
             </button>
