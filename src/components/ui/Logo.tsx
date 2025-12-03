@@ -1,35 +1,39 @@
 import React from 'react';
 import { Dumbbell } from 'lucide-react';
+import Link from 'next/link';
 
 interface LogoProps {
   className?: string;
-  hideText?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'header'; // 'header' usa degradado esmeralda/teal para el texto
+  showText?: boolean;
+  href?: string;
 }
 
-export const Logo = ({ 
-  className = '', 
-  hideText = false,
-  size = 'md'
-}: LogoProps) => {
-  const sizeClasses = {
-    sm: { container: 'w-6 h-6', icon: 'w-4 h-4', text: 'text-base' },
-    md: { container: 'w-8 h-8', icon: 'w-5 h-5', text: 'text-xl' },
-    lg: { container: 'w-10 h-10', icon: 'w-6 h-6', text: 'text-2xl' },
-  };
+export const Logo: React.FC<LogoProps> = ({ 
+  className = "", 
+  variant = 'default',
+  showText = true, 
+  href = "/"
+}) => {
 
-  const sizes = sizeClasses[size];
+  const textClasses = variant === 'header'
+    ? 'bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent'
+    : 'bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent';
 
-  return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <div className={`${sizes.container} bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20`}>
-        <Dumbbell className={`${sizes.icon} text-white`} />
+  const logoContent = (
+    <div className={`flex items-center space-x-2 ${className}`}>
+      {/* Icon */}
+      <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/50">
+        <Dumbbell className="w-6 h-6 text-white" />
       </div>
-      {!hideText && (
-        <span className={`${sizes.text} font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent`}>
-          Web App
+      {/* Text */}
+      {showText && (
+        <span className={`text-2xl font-bold ${textClasses}`}>
+          Sporvit
         </span>
       )}
     </div>
   );
+
+  return href ? <Link href={href}>{logoContent}</Link> : logoContent;
 };
