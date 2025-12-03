@@ -165,12 +165,24 @@ const SporvitLanding = () => {
               <a href="#how-it-works" className="text-slate-300 hover:text-emerald-400 transition-colors">Cómo funciona</a>
               <a href="#pricing" className="text-slate-300 hover:text-emerald-400 transition-colors">Precios</a>
               <a href="/calculators" className="text-slate-300 hover:text-emerald-400 transition-colors">Calculadoras</a>
-              <Link href="/login" className="text-slate-300 hover:text-primary transition-colors">Login</Link>
-              <Button asChild size="sm">
-                <Link href="/register">
-                  Empezar Gratis
+              <div className="flex items-center gap-4">
+                <Link 
+                  href="/login" 
+                  className="text-slate-300 hover:text-primary transition-colors font-medium"
+                >
+                  Login
                 </Link>
-              </Button>
+
+                <Button asChild size="sm">
+                  <Link 
+                    href="/register" 
+                    className="flex items-center gap-2"
+                  >
+                    Empezar Gratis
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Button>
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
