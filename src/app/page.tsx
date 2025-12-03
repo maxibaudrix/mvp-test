@@ -515,7 +515,8 @@ const SporvitLanding = () => {
             <div>
               <h4 className="font-semibold mb-3">Producto</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="#features" className="hover:text-emerald-400">Features</a></li>
+                <li><a href="/Cómo funciona" className="hover:text-emerald-400">Features</a></li>
+                <li><a href="/features" className="hover:text-emerald-400">Features</a></li>
                 <li><a href="#pricing" className="hover:text-emerald-400">Precios</a></li>
                 <li><a href="/calculators" className="hover:text-emerald-400">Calculadoras</a></li>
                 <li><a href="/blog" className="hover:text-emerald-400">Blog</a></li>
