@@ -164,9 +164,9 @@ const SporvitLanding = () => {
               <a href="#pricing" className="text-slate-300 hover:text-emerald-400 transition-colors">Precios</a>
               <a href="/calculators" className="text-slate-300 hover:text-emerald-400 transition-colors">Calculadoras</a>
               <a href="/login" className="text-slate-300 hover:text-emerald-400 transition-colors">Login</a>
-              <button className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105">
+              <PrimaryButton href="/register" large={false} className="px-6 py-2.5" // Puedes pasar clases extra para ajustar el padding si es necesario>
                 Empezar Gratis
-              </button>
+              </PrimaryButton>
             </div>
 
             {/* Mobile Menu Button */}

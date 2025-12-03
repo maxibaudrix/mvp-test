@@ -51,7 +51,14 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
-      borderRadius: {
+      backgroundImage: {
+        // Usa las variables CSS (colores semánticos) que ya tienes definidas
+        'cta-gradient': 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)))',
+        // Opcional: si quieres un gradiente de fondo, podrías usar:
+        'bg-sporvit': 'linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--background-secondary)) 100%)',
+      },
+
+      borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
