@@ -484,9 +484,12 @@ const SporvitLanding = () => {
               <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
                 Únete a miles de personas que ya están alcanzando sus objetivos con Sporvit
               </p>
-              <button className="px-10 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold text-lg hover:shadow-2xl hover:shadow-emerald-500/50 transition-all transform hover:scale-105">
+              <Link 
+                href="/register" 
+                className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all transform hover:scale-105 inline-flex items-center justify-center text-white"
+              >
                 Comenzar Gratis - Sin Tarjeta
-              </button>
+              </Link>
               <p className="text-sm text-slate-500 mt-4">7 días de prueba Pro · Cancela cuando quieras</p>
             </div>
           </div>
