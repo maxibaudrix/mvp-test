@@ -14,9 +14,16 @@ export interface BlogPost {
   date: string; // Formato YYYY-MM-DD
   imageUrl: string; // URL de imagen de portada (simulada)
   isFeatured?: boolean;
+  coverImage: string;
+  excerpt: string;
+  readTime: string;
+  author: {
+    name: string;
+    image: string;
+  };
+
 }
 
-// --- Base de Datos Simulada ---
 const DUMMY_POSTS: BlogPost[] = [
   {
     title: 'La Guía Definitiva de Proteínas y Masa Muscular',
@@ -26,6 +33,15 @@ const DUMMY_POSTS: BlogPost[] = [
     summary: 'Descubre cuánta proteína necesitas realmente para maximizar la síntesis muscular y cómo distribuirla a lo largo del día.',
     date: '2025-11-20',
     imageUrl: 'https://placehold.co/800x450/111827/4ade80?text=Proteínas',
+
+    // Nuevas propiedades
+    coverImage: 'https://placehold.co/800x450/111827/4ade80?text=Proteínas',
+    excerpt: 'Aprende cómo optimizar tu ingesta de proteínas para ganar masa muscular con evidencia científica.',
+    readTime: '8 min',
+    author: {
+      name: 'Equipo Sporvit',
+      image: 'https://placehold.co/100x100/0f172a/4ade80?text=A',
+    },
   },
   {
     title: 'Optimiza tu Dormir para Aumentar tu Rendimiento',
@@ -35,6 +51,14 @@ const DUMMY_POSTS: BlogPost[] = [
     summary: 'El sueño es tu herramienta de recuperación más poderosa. Te enseñamos estrategias avaladas por la ciencia para mejorar la calidad del descanso.',
     date: '2025-11-15',
     imageUrl: 'https://placehold.co/800x450/111827/a78bfa?text=Dormir',
+
+    coverImage: 'https://placehold.co/800x450/111827/a78bfa?text=Dormir',
+    excerpt: 'Dormir bien es fundamental para la recuperación. Aprende cómo mejorar tu descanso hoy.',
+    readTime: '6 min',
+    author: {
+      name: 'Equipo Sporvit',
+      image: 'https://placehold.co/100x100/0f172a/a78bfa?text=A',
+    },
   },
   {
     title: 'Mitos Comunes en la Suplementación Deportiva',
@@ -44,6 +68,14 @@ const DUMMY_POSTS: BlogPost[] = [
     summary: 'Desmentimos los 5 suplementos más populares que no funcionan y te mostramos en qué invertir tu dinero de manera inteligente.',
     date: '2025-10-28',
     imageUrl: 'https://placehold.co/800x450/111827/f87171?text=Mitos',
+
+    coverImage: 'https://placehold.co/800x450/111827/f87171?text=Mitos',
+    excerpt: 'Muchos suplementos no funcionan. Descubre cuáles sí tienen respaldo científico.',
+    readTime: '10 min',
+    author: {
+      name: 'Equipo Sporvit',
+      image: 'https://placehold.co/100x100/0f172a/f87171?text=A',
+    },
   },
   {
     title: 'Receta: Bowl Energético de Avena y Frutos Rojos',
@@ -53,6 +85,14 @@ const DUMMY_POSTS: BlogPost[] = [
     summary: 'Un desayuno rápido, delicioso y cargado de carbohidratos complejos y antioxidantes para empezar el día con la energía de un campeón.',
     date: '2025-10-10',
     imageUrl: 'https://placehold.co/800x450/111827/fcd34d?text=Receta',
+
+    coverImage: 'https://placehold.co/800x450/111827/fcd34d?text=Receta',
+    excerpt: 'Una receta práctica, deliciosa y llena de energía para tus entrenamientos.',
+    readTime: '4 min',
+    author: {
+      name: 'Equipo Sporvit',
+      image: 'https://placehold.co/100x100/0f172a/fcd34d?text=A',
+    },
   },
   {
     title: 'Entrenamiento HITT vs LISS: ¿Cuál es mejor para quemar grasa?',
@@ -62,8 +102,17 @@ const DUMMY_POSTS: BlogPost[] = [
     summary: 'Comparamos los enfoques de alta y baja intensidad, y te ayudamos a elegir el método que mejor se adapta a tus objetivos de pérdida de peso.',
     date: '2025-09-01',
     imageUrl: 'https://placehold.co/800x450/111827/22d3ee?text=Cardio',
+
+    coverImage: 'https://placehold.co/800x450/111827/22d3ee?text=Cardio',
+    excerpt: 'HIIT o LISS, ¿cuál es más efectivo para quemar grasa? Lo analizamos a fondo.',
+    readTime: '7 min',
+    author: {
+      name: 'Equipo Sporvit',
+      image: 'https://placehold.co/100x100/0f172a/22d3ee?text=A',
+    },
   },
 ];
+
 
 // --- Funciones del CMS ---
 
