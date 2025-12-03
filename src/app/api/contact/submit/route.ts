@@ -1,6 +1,13 @@
 // src/app/api/contact/submit/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { contactFormSchema } from '@/lib/validations/contact';
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 
 // Simulación de servicio de email (Resend / SendGrid)
 async function sendEmail(data: any) {
@@ -13,26 +20,29 @@ async function sendEmail(data: any) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    // Extraer y tipar los datos del cuerpo de la solicitud
+    const data: ContactFormData = await req.json();
 
-    // 1. Validar datos con Zod
-    const validation = contactFormSchema.safeParse(body);
-
-    if (!validation.success) {
+    // 1. Validación (Reemplazando el uso de 'contactFormSchema' externo)
+    if (!data.name || !data.email || !data.message) {
+      console.warn('Validation Failed: Missing required fields');
       return NextResponse.json(
-        { error: "Datos inválidos", details: validation.error.format() },
+        { message: 'Missing required fields: name, email, and message are required.' }, 
         { status: 400 }
       );
     }
 
-    // 2. Procesar el envío (Simulado)
-    await sendEmail(validation.data);
+      // Simular server-side processing delay (e.g., guardar en DB, enviar email)
+    await new Promise(resolve => setTimeout(resolve, 1500)); 
 
-    // 3. Responder al cliente
-    return NextResponse.json(
-      { message: "Mensaje enviado correctamente. Te responderemos en breve." },
-      { status: 200 }
-    );
+    // 2. Simular Error de servicio (igual que en el cliente)
+    if (data.email.toLowerCase().includes('error')) {
+      console.error('Simulated Service Error for email:', data.email);
+      return NextResponse.json(
+        { message: 'Failed to send email. Service temporarily unavailable.' },
+        { status: 503 } // Service Unavailable
+      );
+    }
 
   } catch (error) {
     console.error("Error en /api/contact/submit:", error);
