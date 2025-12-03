@@ -3,12 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --background: 2 6 23; /* slate-950 */
-  --foreground: 255 255 255;
+  /* Fondo y Primer Plano */
+  --background: 2 6 23;      /* slate-950 */
+  --foreground: 255 255 255; /* white */
   
-  /* Brand Colors (placeholder - cambiar cuando tengas marca) */
-  --primary: 16 185 129; /* emerald-500 */
-  --primary-dark: 5 150 105; /* emerald-600 */
+  /* Color de fondo para gradiente de secciones (Ej: slate-900) */
+  --background-secondary: 15 23 42; 
+
+  /* Brand Colors (Sporvit: Emerald & Teal) */
+  --primary: 16 185 129;     /* Emerald-500: Verde principal */
+  --primary-foreground: 255 255 255; 
+
+  /* Añadir color secundario para gradientes */
+  --secondary: 13 148 136;   /* Teal-600: Azul-Verde secundario */
+  --secondary-foreground: 255 255 255;
+  
+  /* Si usas variables para efectos como 'ring' (opcional) */
+  --ring: 16 185 129; /* Color de enfoque (primary) */
 }
 
 body {
