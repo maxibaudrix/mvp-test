@@ -1,4 +1,5 @@
-//pages/register.tsx
+//register/page.tsx
+'use client';
 import React, { useState } from 'react';
 import { 
   Mail, Lock, Eye, EyeOff, Dumbbell, AlertCircle, 
