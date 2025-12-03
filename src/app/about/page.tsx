@@ -65,27 +65,6 @@ export default function AboutPreview() {
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-emerald-500/30">
       
-      {/* --- HEADER --- */}
-      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <button className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
-            <div className="p-2 rounded-full group-hover:bg-slate-800 transition-colors">
-                <ArrowLeft className="w-5 h-5" />
-            </div>
-            <span className="hidden sm:inline font-medium">Volver al inicio</span>
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Dumbbell className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">Sporvit</span>
-          </div>
-          
-          <div className="w-24"></div> {/* Spacer */}
-        </div>
-      </header>
-
       <main>
         {/* --- HERO SECTION --- */}
         <section className="relative py-24 overflow-hidden">
@@ -233,12 +212,6 @@ export default function AboutPreview() {
 
       </main>
 
-      {/* Footer Simple */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-8 text-center">
-        <p className="text-slate-600 text-sm">
-          © {new Date().getFullYear()} Sporvit Inc. Hecho con <Heart className="w-3 h-3 inline text-red-500 mx-1" /> en Barcelona.
-        </p>
-      </footer>
-    </div>
+      </div>
   );
 }
