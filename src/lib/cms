@@ -1,0 +1,93 @@
+/**
+ * src/lib/cms.ts
+ * * Este archivo simula la conexión a un CMS (Content Management System) externo
+ * y proporciona los tipos de datos necesarios para que src/app/blog/page.tsx compile.
+ */
+
+// --- Tipado de Datos ---
+export interface BlogPost {
+  title: string;
+  slug: string;
+  category: "Nutrición" | "Entrenamiento" | "Ciencia" | "Recetas";
+  readingTime: number; // Tiempo en minutos
+  summary: string;
+  date: string; // Formato YYYY-MM-DD
+  imageUrl: string; // URL de imagen de portada (simulada)
+  isFeatured?: boolean;
+}
+
+// --- Base de Datos Simulada ---
+const DUMMY_POSTS: BlogPost[] = [
+  {
+    title: 'La Guía Definitiva de Proteínas y Masa Muscular',
+    slug: 'guia-proteinas-musculo',
+    category: 'Nutrición',
+    readingTime: 8,
+    summary: 'Descubre cuánta proteína necesitas realmente para maximizar la síntesis muscular y cómo distribuirla a lo largo del día.',
+    date: '2025-11-20',
+    imageUrl: 'https://placehold.co/800x450/111827/4ade80?text=Proteínas',
+  },
+  {
+    title: 'Optimiza tu Dormir para Aumentar tu Rendimiento',
+    slug: 'dormir-rendimiento',
+    category: 'Entrenamiento',
+    readingTime: 6,
+    summary: 'El sueño es tu herramienta de recuperación más poderosa. Te enseñamos estrategias avaladas por la ciencia para mejorar la calidad del descanso.',
+    date: '2025-11-15',
+    imageUrl: 'https://placehold.co/800x450/111827/a78bfa?text=Dormir',
+  },
+  {
+    title: 'Mitos Comunes en la Suplementación Deportiva',
+    slug: 'mitos-suplementos',
+    category: 'Ciencia',
+    readingTime: 10,
+    summary: 'Desmentimos los 5 suplementos más populares que no funcionan y te mostramos en qué invertir tu dinero de manera inteligente.',
+    date: '2025-10-28',
+    imageUrl: 'https://placehold.co/800x450/111827/f87171?text=Mitos',
+  },
+  {
+    title: 'Receta: Bowl Energético de Avena y Frutos Rojos',
+    slug: 'receta-avena-frutos-rojos',
+    category: 'Recetas',
+    readingTime: 4,
+    summary: 'Un desayuno rápido, delicioso y cargado de carbohidratos complejos y antioxidantes para empezar el día con la energía de un campeón.',
+    date: '2025-10-10',
+    imageUrl: 'https://placehold.co/800x450/111827/fcd34d?text=Receta',
+  },
+  {
+    title: 'Entrenamiento HITT vs LISS: ¿Cuál es mejor para quemar grasa?',
+    slug: 'hitt-vs-liss',
+    category: 'Entrenamiento',
+    readingTime: 7,
+    summary: 'Comparamos los enfoques de alta y baja intensidad, y te ayudamos a elegir el método que mejor se adapta a tus objetivos de pérdida de peso.',
+    date: '2025-09-01',
+    imageUrl: 'https://placehold.co/800x450/111827/22d3ee?text=Cardio',
+  },
+];
+
+// --- Funciones del CMS ---
+
+/**
+ * Simula la obtención de la publicación destacada.
+ */
+export async function getFeaturedPost(): Promise<BlogPost> {
+  // Simular latencia de red
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Devolver el primer post como destacado
+  return DUMMY_POSTS[0];
+}
+
+/**
+ * Simula la obtención de todas las publicaciones, opcionalmente filtradas por categoría.
+ */
+export async function getBlogPosts(category?: string): Promise<BlogPost[]> {
+  // Simular latencia de red
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  if (!category) {
+    return DUMMY_POSTS;
+  }
+
+  return DUMMY_POSTS.filter(post => post.category === category);
+}
