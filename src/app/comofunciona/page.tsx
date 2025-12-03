@@ -50,18 +50,7 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-emerald-500/30">
       
-      {/* --- HEADER SIMPLE --- */}
-      <header className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
-            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Volver al inicio</span>
-          </Link>
-          <span className="font-bold text-lg">Cómo Funciona</span>
-        </div>
-      </header>
-
-      <main className="pt-32 pb-20">
+    <main className="pt-32 pb-20">
 
         {/* --- HERO --- */}
         <section className="container mx-auto px-6 text-center mb-24 max-w-4xl">
