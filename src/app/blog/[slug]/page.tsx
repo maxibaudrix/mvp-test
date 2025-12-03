@@ -39,7 +39,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(post.slug, post.category);
+  const relatedPosts = await getRelatedPosts(post.slug);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans pb-20">
