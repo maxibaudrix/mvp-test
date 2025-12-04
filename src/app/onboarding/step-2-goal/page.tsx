@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { TrendingDown, TrendingUp, Minus, Zap } from 'lucide-react';
 import { useOnboardingStore } from '@/store/onboarding';   
 
-const NEXT_PATH = '/onboarding/step-3-activity';
+const NEXT_PATH = '/onboarding/step-3-diet';
 const PREV_PATH = '/onboarding/step-1-biometrics';
 
 const GOAL_OPTIONS = [
