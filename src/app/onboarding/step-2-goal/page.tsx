@@ -2,6 +2,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react'; 
 import { Card, CardContent } from '@/components/ui/card';
 import StepHeader from '@/components/onboarding/StepHeader';
 import StepButtons from '@/components/onboarding/StepButtons';
@@ -10,6 +11,7 @@ import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
 import { useOnboardingStore } from '@/store/onboarding';
 import { TrendingDown, TrendingUp, Minus, Zap, Target, AlertCircle } from 'lucide-react';
+import { GoalGuideModal } from '@/components/onboarding/GoalGuideModal';
 
 const NEXT_PATH = '/onboarding/step-3-activity';
 const PREV_PATH = '/onboarding/step-1-biometrics';
@@ -55,9 +57,13 @@ const SPEED_OPTIONS = [
   { id: 'AGGRESSIVE', label: 'Agresivo', description: 'Intensivo', weeks: '8-12 semanas' },
 ];
 
+
+
 export default function Step2GoalPage() {
   const router = useRouter();
   const { setGoal } = useOnboardingStore();
+
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const {
     register,
@@ -278,16 +284,26 @@ export default function Step2GoalPage() {
           </CardContent>
         </Card>
 
-        {/* Help Link */}
+        {/* Help Link (MODIFICADO para abrir el modal) */}
         <div className="text-center mt-6">
           <p className="text-slate-500 text-sm">
             ¿No estás seguro de tu objetivo?{' '}
-            <a href="/guides/choose-goal" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+            <button 
+              type="button" // Cambiado de <a> a <button>
+              onClick={() => setIsGuideOpen(true)} // Abre el modal
+              className="text-emerald-400 hover:text-emerald-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-md"
+            >
               Lee nuestra guía
-            </a>
+            </button>
           </p>
         </div>
       </div>
+
+      {/* RENDERIZAR EL MODAL */}
+      <GoalGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+      />
     </div>
   );
 }
