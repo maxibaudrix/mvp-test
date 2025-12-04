@@ -1,13 +1,15 @@
 // src/lib/auth/auth-options.ts
-import { NextAuthOptions } from 'next-auth'
+import { type AuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import AppleProvider from 'next-auth/providers/apple'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 import { verifyPassword } from './password'
+import type { JWT } from 'next-auth/jwt'
+import type { Session, User, Account } from 'next-auth'
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   
   providers: [
@@ -30,7 +32,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials?: { email: string; password: string }) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Email y contraseña requeridos')
         }
@@ -76,21 +78,21 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account }: { token: JWT; user?: User; account?: Account | null }) {
       if (user) {
         token.id = user.id
       }
       return token
     },
 
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (token && session.user) {
         session.user.id = token.id as string
       }
       return session
     },
 
-    async redirect({ url, baseUrl }) {
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
       // Redirect después de login
       if (url.startsWith('/')) return `${baseUrl}${url}`
       else if (new URL(url).origin === baseUrl) return url
@@ -99,7 +101,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   events: {
-    async createUser({ user }) {
+    async createUser({ user }: { user: User }) {
       // Enviar email de bienvenida al registrarse
       // Implementar aquí si necesitas
       console.log('Nuevo usuario creado:', user.email)
