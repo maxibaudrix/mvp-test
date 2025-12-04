@@ -98,7 +98,7 @@ export default function ContactPage() {
       
       <main className="pt-10 px-4 container mx-auto max-w-6xl">
         
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 mt-16 md:mt-24">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 text-white">Ayuda y Soporte</h1>
           <p className="text-slate-400 max-w-xl mx-auto">
             ¿Tienes problemas con tu plan? Estamos aquí para ayudarte a optimizar tu experiencia en Sporvit.
@@ -134,7 +134,7 @@ export default function ContactPage() {
                   <div>
                     <p className="text-sm font-medium text-slate-300">Chat en Vivo</p>
                     <button className="text-white hover:text-emerald-400 transition-colors text-left font-semibold underline decoration-slate-700 underline-offset-4">
-                      Inicira conversación
+                      Iniciar conversación
                     </button>
                     <p className="text-xs text-slate-500 mt-1">Lun-Vie: 9:00 - 18:00</p>
                   </div>
