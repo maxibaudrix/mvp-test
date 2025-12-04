@@ -1,4 +1,3 @@
-// src/app/onboarding/step-6-summary/page.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -7,7 +6,7 @@ import StepHeader from '@/components/onboarding/StepHeader';
 import { Button } from '@/components/ui/button';
 import { useOnboardingStore } from '@/store/onboarding';
 import { useState, useEffect } from 'react';
-import { Loader2, CheckCircle, AlertCircle, Calculator, Flame, Apple } from 'lucide-react';
+import { Loader2, CheckCircle, AlertCircle, Calculator, Flame, Apple, Dumbbell, Bike, Activity } from 'lucide-react';
 
 const PREV_PATH = '/onboarding/step-5-diet';
 
@@ -25,58 +24,79 @@ export default function Step6SummaryPage() {
     fats: number;
   } | null>(null);
 
-  // Calcular macros al cargar la página
+  // Calcular macros al cargar
   useEffect(() => {
-    if (data.biometrics && data.lifestyle) {
-      const macros = calculateMacros();
-      setCalculatedMacros(macros);
+    if (data.biometrics && data.goal && data.activity && data.training) {
+      setCalculatedMacros(calculateMacros());
     }
   }, [data]);
 
-  // Función simplificada de cálculo (replica lógica de tu flujo de onboarding)
+  // ============================
+  // NUEVA FUNCIÓN DE CÁLCULO REAL
+  // ============================
   const calculateMacros = () => {
     const { age, gender, height, weight } = data.biometrics!;
-    const { activityLevel, goal, weeklyTarget } = data.lifestyle!;
+    const { goalType, targetWeight, goalSpeed } = data.goal!;
+    const activity = data.activity!;
+    const training = data.training!;
 
+    // ----------------------------
     // BMR (Mifflin-St Jeor)
-    let bmr = 10 * weight + 6.25 * height - 5 * age;
-    bmr += gender === 'MALE' ? 5 : -161;
+    // ----------------------------
+    let bmr = 10 * weight + 6.25 * height - 5 * age + (gender === 'MALE' ? 5 : -161);
+    bmr = Math.round(bmr);
 
-    // PAL (Physical Activity Level)
-    const palValues: Record<string, number> = {
+    // ----------------------------
+    // PAL combinado (actividad diaria + entrenamiento)
+    // ----------------------------
+    const PAL_BASE: Record<string, number> = {
       SEDENTARY: 1.2,
-      LIGHTLY_ACTIVE: 1.375,
-      MODERATELY_ACTIVE: 1.55,
-      VERY_ACTIVE: 1.725,
-      EXTREMELY_ACTIVE: 1.9,
+      LIGHTLY_ACTIVE: 1.35,
+      MODERATELY_ACTIVE: 1.5,
+      VERY_ACTIVE: 1.7,
+      SUPER_ACTIVE: 1.9,
     };
-    const tdee = Math.round(bmr * palValues[activityLevel]);
 
-    // Ajuste calórico según objetivo
-    let targetCalories = tdee;
-    if (goal === 'LOSE' && weeklyTarget) {
-      targetCalories = tdee - (weeklyTarget * 7700 / 7); // Déficit
-    } else if (goal === 'GAIN' && weeklyTarget) {
-      targetCalories = tdee + (weeklyTarget * 7700 / 7); // Superávit
+    const PAL_TRAINING: Record<string, number> = {
+      BEGINNER: 1.0,
+      INTERMEDIATE: 1.05,
+      ADVANCED: 1.10,
+    };
+
+    const TDEE = Math.round(bmr * PAL_BASE[activity.activityLevel] * PAL_TRAINING[training.trainingLevel]);
+
+    // ----------------------------
+    // Ajuste según objetivo
+    // ----------------------------
+    let targetCalories = TDEE;
+    if (goalType === 'LOSE' && targetWeight) {
+      targetCalories = Math.round(TDEE - 400);
+    }
+    if (goalType === 'GAIN' && targetWeight) {
+      targetCalories = Math.round(TDEE + 350);
     }
 
-    // Macros (Simplificado)
-    const protein = Math.round(weight * 2.0); // 2g/kg
-    const fats = Math.round((targetCalories * 0.25) / 9); // 25% calorías
-    const remainingCals = targetCalories - (protein * 4) - (fats * 9);
-    const carbs = Math.round(remainingCals / 4);
+    // ----------------------------
+    // Macros
+    // ----------------------------
+    const protein = Math.round(weight * 2.0);
+    const fats = Math.round((targetCalories * 0.25) / 9);
+    const remaining = targetCalories - protein * 4 - fats * 9;
+    const carbs = Math.round(Math.max(remaining / 4, 0));
 
     return {
-      bmr: Math.round(bmr),
-      tdee,
-      targetCalories: Math.round(targetCalories),
+      bmr,
+      tdee: TDEE,
+      targetCalories,
       protein,
-      carbs: Math.max(0, carbs),
+      carbs,
       fats,
     };
   };
 
-  // Función para finalizar onboarding
+  // ============================
+  // Guardar perfil final
+  // ============================
   const handleFinalize = async () => {
     if (!calculatedMacros) {
       setSaveError('No se pudieron calcular los macros. Revisa tus datos.');
@@ -87,35 +107,21 @@ export default function Step6SummaryPage() {
     setSaveError(null);
 
     try {
-      // Payload completo para la API
       const payload = {
-        // Biometrics
-        age: data.biometrics?.age,
-        gender: data.biometrics?.gender,
-        height: data.biometrics?.height,
-        weight: data.biometrics?.weight,
-        bodyFatPercentage: data.biometrics?.bodyFatPercentage,
+        biometrics: data.biometrics,
+        goal: data.goal,
+        activity: data.activity,
+        training: data.training,
+        diet: data.diet,
 
-        // Goal
-        goalType: data.lifestyle?.goal,
-        targetWeight: data.goal?.targetWeight,
-        weeklyTarget: data.lifestyle?.weeklyTarget,
-
-        // Lifestyle
-        activityLevel: data.lifestyle?.activityLevel,
-
-        // Diet
-        dietType: data.diet?.dietType,
-        allergies: data.diet?.allergies || [],
-        excludedIngredients: data.diet?.excludedIngredients || [],
-
-        // Calculated Macros
-        bmr: calculatedMacros.bmr,
-        tdee: calculatedMacros.tdee,
-        targetCalories: calculatedMacros.targetCalories,
-        targetProteinG: calculatedMacros.protein,
-        targetCarbsG: calculatedMacros.carbs,
-        targetFatG: calculatedMacros.fats,
+        macros: {
+          bmr: calculatedMacros.bmr,
+          tdee: calculatedMacros.tdee,
+          targetCalories: calculatedMacros.targetCalories,
+          protein: calculatedMacros.protein,
+          carbs: calculatedMacros.carbs,
+          fats: calculatedMacros.fats,
+        },
       };
 
       const response = await fetch('/api/onboarding/complete', {
@@ -129,11 +135,11 @@ export default function Step6SummaryPage() {
         throw new Error(error.error?.message || 'Error al guardar el perfil');
       }
 
-      // Éxito - Redirigir al dashboard
       router.push('/dashboard');
+
     } catch (error: any) {
-      setSaveError(error.message || 'Error desconocido al finalizar');
-      console.error('Error al finalizar onboarding:', error);
+      setSaveError(error.message || 'Error desconocido');
+      console.error('❌ Error Onboarding Final:', error);
     } finally {
       setIsSaving(false);
     }
@@ -147,149 +153,70 @@ export default function Step6SummaryPage() {
     );
   }
 
+  // ============================
+  //     UI COMPLETAMENTE MEJORADA
+  // ============================
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
       <div className="w-full max-w-3xl">
         <Card className="shadow-2xl border-slate-800 bg-slate-900">
+          
           <StepHeader
             currentStep={6}
             totalSteps={6}
-            title="Tu Plan Nutricional"
-            description="Revisa tus macros calculados y finaliza tu perfil"
+            title="Resumen de tu Perfil"
+            description="Revisa tus datos y finaliza tu plan personalizado"
           />
-          
-          <CardContent className="space-y-6">
-            {/* Cálculos Resumen */}
+
+          <CardContent className="space-y-10">
+
+            {/* ========================== */}
+            {/*    SECCIÓN 1: CÁLCULOS     */}
+            {/* ========================== */}
             <div className="grid md:grid-cols-3 gap-4">
-              {/* BMR */}
-              <div className="p-5 rounded-xl bg-slate-800/50 border border-slate-700">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                    <Calculator className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400">BMR</p>
-                    <p className="text-2xl font-bold text-white">{calculatedMacros.bmr}</p>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-500">Metabolismo basal</p>
-              </div>
+              <SummaryCard
+                icon={<Calculator className="w-5 h-5 text-blue-400" />}
+                title="BMR"
+                value={calculatedMacros.bmr}
+                desc="Metabolismo basal"
+              />
 
-              {/* TDEE */}
-              <div className="p-5 rounded-xl bg-slate-800/50 border border-slate-700">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center">
-                    <Flame className="w-5 h-5 text-orange-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400">TDEE</p>
-                    <p className="text-2xl font-bold text-white">{calculatedMacros.tdee}</p>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-500">Gasto diario total</p>
-              </div>
+              <SummaryCard
+                icon={<Flame className="w-5 h-5 text-orange-400" />}
+                title="TDEE"
+                value={calculatedMacros.tdee}
+                desc="Gasto calórico diario"
+              />
 
-              {/* Target Calories */}
-              <div className="p-5 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border-2 border-emerald-500/30">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                    <Apple className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-emerald-300">Objetivo</p>
-                    <p className="text-2xl font-bold text-white">{calculatedMacros.targetCalories}</p>
-                  </div>
-                </div>
-                <p className="text-xs text-emerald-200/70">Calorías diarias</p>
-              </div>
+              <SummaryCard
+                icon={<Apple className="w-5 h-5 text-emerald-400" />}
+                title="Calorías Objetivo"
+                value={calculatedMacros.targetCalories}
+                desc="Consumo recomendado"
+                highlight
+              />
             </div>
 
-            {/* Macros Breakdown */}
-            <div className="p-6 rounded-xl bg-slate-800/50 border border-slate-700">
-              <h3 className="text-lg font-bold text-white mb-4">Distribución de Macronutrientes</h3>
-              
-              <div className="space-y-4">
-                {/* Proteína */}
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-300 font-medium">Proteína</span>
-                    <span className="text-white font-bold">{calculatedMacros.protein}g</span>
-                  </div>
-                  <div className="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500" style={{ width: '33%' }} />
-                  </div>
-                </div>
+            {/* ========================== */}
+            {/* SECCIÓN 2: MACROS          */}
+            {/* ========================== */}
+            <MacrosDisplay macros={calculatedMacros} />
 
-                {/* Carbohidratos */}
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-300 font-medium">Carbohidratos</span>
-                    <span className="text-white font-bold">{calculatedMacros.carbs}g</span>
-                  </div>
-                  <div className="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-500" style={{ width: '45%' }} />
-                  </div>
-                </div>
+            {/* ========================== */}
+            {/* SECCIÓN 3: DETALLES USER   */}
+            {/* ========================== */}
+            <UserSummary data={data} />
 
-                {/* Grasas */}
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-300 font-medium">Grasas</span>
-                    <span className="text-white font-bold">{calculatedMacros.fats}g</span>
-                  </div>
-                  <div className="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
-                    <div className="h-full bg-yellow-500" style={{ width: '22%' }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Resumen de Preferencias */}
-            <div className="p-4 bg-slate-800/30 border border-slate-700 rounded-xl">
-              <h4 className="text-sm font-bold text-white mb-3">Tus Preferencias</h4>
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <span className="text-slate-400">Objetivo:</span>
-                  <span className="text-white font-medium ml-2">
-                    {data.lifestyle?.goal === 'LOSE' ? 'Perder Peso' : 
-                     data.lifestyle?.goal === 'GAIN' ? 'Ganar Músculo' : 'Mantener'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400">Dieta:</span>
-                  <span className="text-white font-medium ml-2">
-                    {data.diet?.dietType || 'Omnívora'}
-                  </span>
-                </div>
-                {data.diet?.allergies && data.diet.allergies.length > 0 && (
-                  <div className="col-span-2">
-                    <span className="text-slate-400">Alergias:</span>
-                    <span className="text-red-400 font-medium ml-2">
-                      {data.diet.allergies.join(', ')}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Error Message */}
+            {/* ========================== */}
+            {/* ERRORES                    */}
+            {/* ========================== */}
             {saveError && (
-              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-red-300">Error al Guardar</p>
-                  <p className="text-xs text-red-400 mt-1">{saveError}</p>
-                </div>
-              </div>
+              <ErrorBox message={saveError} />
             )}
           </CardContent>
 
           <CardFooter className="flex justify-between pt-6">
-            <Button
-              variant="outline"
-              onClick={() => router.push(PREV_PATH)}
-              disabled={isSaving}
-            >
+            <Button variant="outline" onClick={() => router.push(PREV_PATH)}>
               ← Volver
             </Button>
 
@@ -306,12 +233,117 @@ export default function Step6SummaryPage() {
               ) : (
                 <>
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  Finalizar y Empezar
+                  Finalizar
                 </>
               )}
             </Button>
           </CardFooter>
+
         </Card>
+      </div>
+    </div>
+  );
+}
+
+/* ======================================================
+   COMPONENTES REUTILIZABLES PARA HACER EL ARCHIVO LIMPIO
+   ====================================================== */
+
+function SummaryCard({ icon, title, value, desc, highlight = false }: any) {
+  return (
+    <div className={`p-6 rounded-xl border ${
+      highlight
+        ? 'bg-emerald-600/20 border-emerald-500/50'
+        : 'bg-slate-800/40 border-slate-700'
+    }`}>
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 bg-black/20 rounded-lg flex items-center justify-center">
+          {icon}
+        </div>
+        <div>
+          <p className="text-xs text-slate-400">{title}</p>
+          <p className="text-2xl font-bold text-white">{value}</p>
+        </div>
+      </div>
+      <p className="text-xs text-slate-500">{desc}</p>
+    </div>
+  );
+}
+
+function MacrosDisplay({ macros }: any) {
+  return (
+    <div className="p-6 rounded-xl bg-slate-800/40 border border-slate-700">
+      <h3 className="text-lg font-bold text-white mb-4">Macronutrientes Diarios</h3>
+
+      <MacroItem label="Proteína" gram={macros.protein} />
+      <MacroItem label="Carbohidratos" gram={macros.carbs} />
+      <MacroItem label="Grasas" gram={macros.fats} />
+    </div>
+  );
+}
+
+function MacroItem({ label, gram }: any) {
+  return (
+    <div className="mb-4">
+      <div className="flex justify-between text-sm mb-1">
+        <span className="text-slate-300">{label}</span>
+        <span className="text-white font-bold">{gram}g</span>
+      </div>
+      <div className="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
+        <div className="h-full bg-emerald-500" style={{ width: '40%' }} />
+      </div>
+    </div>
+  );
+}
+
+function UserSummary({ data }: any) {
+  return (
+    <div className="p-4 bg-slate-800/20 border border-slate-700 rounded-xl">
+      <h4 className="text-sm font-bold text-white mb-3">Resumen de tus Datos</h4>
+
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        
+        <div><b className="text-emerald-400">Edad:</b> {data.biometrics?.age}</div>
+        <div><b className="text-emerald-400">Peso:</b> {data.biometrics?.weight}kg</div>
+        <div><b className="text-emerald-400">Altura:</b> {data.biometrics?.height}cm</div>
+
+        {data.biometrics?.bodyFatPercentage && (
+          <div className="col-span-2">
+            <b className="text-emerald-400">Grasa Corporal:</b> {data.biometrics.bodyFatPercentage}%
+          </div>
+        )}
+
+        <div className="col-span-2 mt-2">
+          <b className="text-emerald-400">Objetivo:</b> {data.goal?.goalType}
+        </div>
+
+        {/* Activity */}
+        <div className="col-span-2 mt-2">
+          <b className="text-blue-400">Actividad Diaria:</b> {data.activity?.activityLevel}
+        </div>
+
+        {/* Training */}
+        <div className="col-span-2 mt-2">
+          <b className="text-orange-400">Nivel de Entrenamiento:</b> {data.training?.trainingLevel}
+        </div>
+        <div className="col-span-2">
+          <b className="text-orange-400">Frecuencia:</b> {data.training?.trainingFrequency} / semana
+        </div>
+        <div className="col-span-2">
+          <b className="text-orange-400">Disciplinas:</b> {data.training?.trainingTypes?.join(', ')}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ErrorBox({ message }: any) {
+  return (
+    <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3">
+      <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+      <div>
+        <p className="text-sm font-semibold text-red-300">Error al Guardar</p>
+        <p className="text-xs text-red-400 mt-1">{message}</p>
       </div>
     </div>
   );
