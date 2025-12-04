@@ -41,16 +41,12 @@ export interface ActivityData {
 // ============================================
 // PASO 4: NIVEL DE ENTRENAMIENTO
 // ============================================
-export interface LifestyleData {
-  activityLevel:
-    | 'SEDENTARY'
-    | 'LIGHTLY_ACTIVE'
-    | 'MODERATELY_ACTIVE'
-    | 'VERY_ACTIVE'
-    | 'EXTREMELY_ACTIVE';
-
-  goal: 'MAINTAIN' | 'LOSE' | 'GAIN';
-  weeklyTarget?: number;
+export interface TrainingData {
+  trainingLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  trainingFrequency: '1_2' | '3_4' | '5_6' | 'DOUBLE';
+  trainingTypes: string[];
+  sessionDuration: 'UNDER_30' | '30_60' | '60_90' | 'OVER_90';
+  intensity: 'LOW' | 'MODERATE' | 'HIGH';
 }
 
 // ============================================
@@ -81,8 +77,10 @@ export interface OnboardingData {
   biometrics?: BiometricsData;
   goal?: GoalData;
   activity?: ActivityData;       // ✅ agregado
+  training?: TrainingData;
   lifestyle?: LifestyleData;
   diet?: DietData;
+  
 
   calculatedMacros?: {
     bmr: number;

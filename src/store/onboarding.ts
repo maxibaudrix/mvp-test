@@ -6,7 +6,7 @@ import { persist } from 'zustand/middleware';
 import { 
   BiometricsData, 
   GoalData, 
-  LifestyleData, 
+  TrainingData,
   DietData, 
   OnboardingData,
   ActivityData
@@ -20,7 +20,7 @@ interface OnboardingStore {
   setBiometrics: (data: BiometricsData) => void;
   setGoal: (data: GoalData) => void;
   setActivity: (data: ActivityData) => void;
-  setLifestyle: (data: LifestyleData) => void;
+  setTraining: (data: TrainingData) => void;
   setDiet: (data: DietData) => void;
   setCalculatedMacros: (macros: OnboardingData['calculatedMacros']) => void;
   
@@ -34,6 +34,7 @@ const initialState: OnboardingData = {
   biometrics: undefined,
   goal: undefined,
   activity: undefined,
+  training: undefined,
   lifestyle: undefined,
   diet: undefined,
   calculatedMacros: undefined,
@@ -61,7 +62,12 @@ export const useOnboardingStore = create<OnboardingStore>()(
           data: { ...state.data, activity },
         })),
 
-      setLifestyle: (lifestyle) =>
+      setTraining: (training) =>
+        set((state) => ({
+          data: { ...state.data, training },
+        })),
+
+      setLifestyle: (lifestyle: any) =>
         set((state) => ({
           data: { ...state.data, lifestyle },
         })),

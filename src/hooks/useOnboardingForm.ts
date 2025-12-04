@@ -100,33 +100,24 @@ export const activitySchema = z.object({
 });
 
 // STEP 4 — NIVEL DE ENTRENAMIENTO
-export const lifestyleSchema = z.object({
-  activityLevel: z.enum(
-    [
-      'SEDENTARY',
-      'LIGHTLY_ACTIVE',
-      'MODERATELY_ACTIVE',
-      'VERY_ACTIVE',
-      'EXTREMELY_ACTIVE',
-    ],
-    {
-      required_error: 'Selecciona tu nivel de actividad',
-      invalid_type_error: 'Selecciona una opción válida',
-    }
-  ),
-
-  goal: z.enum(['MAINTAIN', 'LOSE', 'GAIN'], {
-    required_error: 'Selecciona tu objetivo',
-    invalid_type_error: 'Selecciona una opción válida',
+export const trainingSchema = z.object({
+  trainingLevel: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED'], {
+    required_error: 'Selecciona tu nivel de entrenamiento',
   }),
 
-  weeklyTarget: z
-    .number({
-      invalid_type_error: 'Ingresa un número válido',
-    })
-    .min(0.25, 'Mínimo: 0.25 kg/semana')
-    .max(1.5, 'Máximo: 1.5 kg/semana')
-    .optional(),
+  trainingFrequency: z.enum(['1_2', '3_4', '5_6', 'DOUBLE'], {
+    required_error: 'Selecciona cuántos días entrenas a la semana',
+  }),
+
+  trainingTypes: z.array(z.string()).min(1, 'Selecciona al menos un tipo de entrenamiento'),
+
+  sessionDuration: z.enum(['UNDER_30', '30_60', '60_90', 'OVER_90'], {
+    required_error: 'Selecciona la duración media de tus sesiones',
+  }),
+
+  intensity: z.enum(['LOW', 'MODERATE', 'HIGH'], {
+    required_error: 'Selecciona tu intensidad habitual',
+  }),
 });
 
 // STEP 5 — DIETA (ACTUALIZADO)
