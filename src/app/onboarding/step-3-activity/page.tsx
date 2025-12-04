@@ -1,124 +1,203 @@
-// src/app/onboarding/step-3-diet/page.tsx
+// src/app/onboarding/step-3-activity/page.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import StepHeader from '@/components/onboarding/StepHeader';
 import StepButtons from '@/components/onboarding/StepButtons';
-import { useOnboardingForm, dietSchema } from '@/hooks/useOnboardingForm';
+import { useOnboardingForm, activitySchema } from '@/hooks/useOnboardingForm';
 import { Label } from '@/components/ui/Label';
-import { Select } from '@/components/ui/Select';
-import { Checkbox } from '@/components/ui/Checkbox';
+import { useOnboardingStore } from '@/store/onboarding';
 
 const NEXT_PATH = '/onboarding/step-4-training-level';
 const PREV_PATH = '/onboarding/step-2-goal';
 
-const DIET_TYPES = [
-  { value: 'OMNIVORE', label: 'Omnívora' },
-  { value: 'VEGETARIAN', label: 'Vegetariana' },
-  { value: 'VEGAN', label: 'Vegana' },
-  { value: 'KETO', label: 'Cetogénica' },
-  { value: 'PALEO', label: 'Paleo' },
+const ACTIVITY_LEVELS = [
+  { value: 'SEDENTARY', label: 'Sedentario (menos de 4k pasos)' },
+  { value: 'LIGHTLY_ACTIVE', label: 'Ligeramente activo (4k–7k pasos)' },
+  { value: 'MODERATELY_ACTIVE', label: 'Moderadamente activo (7k–10k pasos)' },
+  { value: 'VERY_ACTIVE', label: 'Muy activo (más de 10k pasos)' },
+  { value: 'SUPER_ACTIVE', label: 'Súper activo (trabajo físico intenso)' },
 ];
 
-const ALLERGIES = [
-  'Gluten',
-  'Lactosa',
-  'Frutos Secos',
-  'Mariscos',
-  'Huevo',
-  'Soja',
+const STEPS_RANGE = [
+  { value: 'UNDER_3000', label: '< 3.000 pasos/día' },
+  { value: '3K_6K', label: '3.000–6.000 pasos/día' },
+  { value: '6K_10K', label: '6.000–10.000 pasos/día' },
+  { value: 'OVER_10K', label: '> 10.000 pasos/día' },
 ];
 
-export default function Step3DietPage() {
+const SITTING_HOURS = [
+  { value: 'LESS_THAN_4H', label: '< 4 horas sentado' },
+  { value: '4H_6H', label: '4–6 horas sentado' },
+  { value: '6H_8H', label: '6–8 horas sentado' },
+  { value: 'MORE_THAN_8H', label: '> 8 horas sentado' },
+];
+
+const WORK_TYPES = [
+  { value: 'DESK', label: 'Trabajo de oficina (sedentario)' },
+  { value: 'MIXED', label: 'Trabajo mixto / algo de movimiento' },
+  { value: 'ACTIVE', label: 'Trabajo activo (caminatas frecuentes)' },
+  { value: 'PHYSICAL', label: 'Trabajo físico intenso' },
+];
+
+export default function Step3ActivityPage() {
   const router = useRouter();
+  const { setActivity } = useOnboardingStore();
 
   const {
     register,
     handleSubmitStore,
     formState: { errors, isSubmitting },
     watch,
-    setValue,
-  } = useOnboardingForm(3, dietSchema, () => {
+  } = useOnboardingForm(3, activitySchema, (formData) => {
+    setActivity(formData);
     router.push(NEXT_PATH);
   });
 
-  const allergies = watch('allergies') || [];
-
-  const toggleAllergy = (allergy: string) => {
-    const current = allergies;
-    if (current.includes(allergy)) {
-      setValue('allergies', current.filter((a: string) => a !== allergy));
-    } else {
-      setValue('allergies', [...current, allergy]);
-    }
-  };
+  const activityLevel = watch('activityLevel');
+  const dailySteps = watch('dailySteps');
+  const sittingHours = watch('sittingHours');
+  const workType = watch('workType');
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
       <div className="w-full max-w-2xl">
         <Card className="shadow-2xl border-slate-800 bg-slate-900">
+          
           <StepHeader
             currentStep={3}
             totalSteps={6}
-            title="Preferencias Dietéticas"
-            description="Personaliza tu plan según tu estilo de alimentación"
+            title="Actividad Diaria"
+            description="Cuéntanos sobre tu movimiento diario para estimar tu NEAT"
           />
-          
-          <CardContent>
-            <form onSubmit={handleSubmitStore} className="space-y-6">
-              {/* Tipo de Dieta */}
-              <div>
-                <Label htmlFor="dietType" className="mb-2 block">Tipo de Dieta</Label>
-                <Select id="dietType" {...register('dietType')}>
-                  <option value="">Selecciona tu dieta</option>
-                  {DIET_TYPES.map(diet => (
-                    <option key={diet.value} value={diet.value}>
-                      {diet.label}
-                    </option>
-                  ))}
-                </Select>
-                {errors.dietType && (
-                  <p className="text-red-500 text-xs mt-1">{errors.dietType.message?.toString()}</p>
-                )}
-              </div>
 
-              {/* Alergias / Intolerancias */}
+          <CardContent>
+            <form onSubmit={handleSubmitStore} className="space-y-8">
+
+              {/* NIVEL DE ACTIVIDAD (OBLIGATORIO) */}
               <div>
-                <Label className="mb-4 block">Alergias e Intolerancias</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  {ALLERGIES.map(allergy => (
+                <Label className="mb-3 block">Nivel de Actividad Diaria</Label>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {ACTIVITY_LEVELS.map((item) => (
                     <Label
-                      key={allergy}
-                      className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
-                        allergies.includes(allergy)
-                          ? 'bg-red-500/20 border-2 border-red-500/50 text-red-400'
-                          : 'bg-slate-800 border-2 border-slate-700 text-slate-300 hover:bg-slate-700'
+                      key={item.value}
+                      htmlFor={item.value}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all text-center ${
+                        activityLevel === item.value
+                          ? 'bg-emerald-600 border-emerald-600 text-white shadow-xl'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                       }`}
                     >
                       <input
-                        type="checkbox"
-                        checked={allergies.includes(allergy)}
-                        onChange={() => toggleAllergy(allergy)}
+                        type="radio"
+                        id={item.value}
+                        value={item.value}
+                        {...register('activityLevel')}
                         className="sr-only"
                       />
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                        allergies.includes(allergy)
-                          ? 'bg-red-500 border-red-500'
-                          : 'border-slate-600'
-                      }`}>
-                        {allergies.includes(allergy) && (
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm font-medium">{allergy}</span>
+                      {item.label}
+                    </Label>
+                  ))}
+                </div>
+
+                {errors.activityLevel && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.activityLevel.message?.toString()}
+                  </p>
+                )}
+              </div>
+
+              {/* PASOS DIARIOS (OPCIONAL) */}
+              <div>
+                <Label className="mb-3 block">
+                  Pasos Diarios Promedio (Opcional)
+                </Label>
+
+                <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
+                  {STEPS_RANGE.map((item) => (
+                    <Label
+                      key={item.value}
+                      htmlFor={item.value}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all text-center ${
+                        dailySteps === item.value
+                          ? 'bg-emerald-500/30 border-emerald-600 text-emerald-300 shadow-md'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        id={item.value}
+                        value={item.value}
+                        {...register('dailySteps')}
+                        className="sr-only"
+                      />
+                      {item.label}
                     </Label>
                   ))}
                 </div>
               </div>
 
+              {/* HORAS SENTADO (OPCIONAL) */}
+              <div>
+                <Label className="mb-3 block">
+                  Horas Sentado al Día (Opcional)
+                </Label>
+
+                <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
+                  {SITTING_HOURS.map((item) => (
+                    <Label
+                      key={item.value}
+                      htmlFor={item.value}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all text-center ${
+                        sittingHours === item.value
+                          ? 'bg-emerald-500/30 border-emerald-600 text-emerald-300 shadow-md'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        id={item.value}
+                        value={item.value}
+                        {...register('sittingHours')}
+                        className="sr-only"
+                      />
+                      {item.label}
+                    </Label>
+                  ))}
+                </div>
+              </div>
+
+              {/* TIPO DE TRABAJO (OPCIONAL) */}
+              <div>
+                <Label className="mb-3 block">Tipo de Trabajo (Opcional)</Label>
+
+                <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
+                  {WORK_TYPES.map((item) => (
+                    <Label
+                      key={item.value}
+                      htmlFor={item.value}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all text-center ${
+                        workType === item.value
+                          ? 'bg-emerald-500/30 border-emerald-600 text-emerald-300 shadow-md'
+                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        id={item.value}
+                        value={item.value}
+                        {...register('workType')}
+                        className="sr-only"
+                      />
+                      {item.label}
+                    </Label>
+                  ))}
+                </div>
+              </div>
+
+              {/* BOTONES DE NAVEGACIÓN */}
               <StepButtons
                 currentStep={3}
                 nextPath={NEXT_PATH}
@@ -129,6 +208,7 @@ export default function Step3DietPage() {
               />
             </form>
           </CardContent>
+
         </Card>
       </div>
     </div>
