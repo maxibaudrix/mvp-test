@@ -1,6 +1,5 @@
 // src/app/api/onboarding/complete/route.ts
 import { NextResponse } from "next/server";
-// ✅ Correcto
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth-options";
 import prisma from "@/lib/prisma";
