@@ -20,8 +20,18 @@ export interface GoalData {
   goalSpeed?: 'SLOW' | 'MODERATE' | 'AGGRESSIVE'; // solo si no MAINTAIN
 }
 
+//============================================
+// PASO 3: LIFESTYLE (Activity ) 
 // ============================================
-// PASO 3-4: LIFESTYLE (Activity + Training Level)
+export interface OnboardingActivity {
+  activityLevel: string;
+  dailySteps?: string;
+  sittingHours?: string;
+  workType?: string;
+}
+
+// ============================================
+// PASO 3-4: LIFESTYLE (Training Level)
 // ============================================
 export interface LifestyleData {
   activityLevel: 'SEDENTARY' | 'LIGHTLY_ACTIVE' | 'MODERATELY_ACTIVE' | 'VERY_ACTIVE' | 'EXTREMELY_ACTIVE';

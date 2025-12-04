@@ -8,7 +8,8 @@ import {
   GoalData, 
   LifestyleData, 
   DietData, 
-  OnboardingData 
+  OnboardingData,
+  ActivityData
 } from '@/types/onboarding';
 
 interface OnboardingStore {
@@ -18,6 +19,7 @@ interface OnboardingStore {
   // Actions
   setBiometrics: (data: BiometricsData) => void;
   setGoal: (data: GoalData) => void;
+  setActivity: (data: ActivityData) => void;
   setLifestyle: (data: LifestyleData) => void;
   setDiet: (data: DietData) => void;
   setCalculatedMacros: (macros: OnboardingData['calculatedMacros']) => void;
@@ -31,6 +33,7 @@ interface OnboardingStore {
 const initialState: OnboardingData = {
   biometrics: undefined,
   goal: undefined,
+  activity: undefined,
   lifestyle: undefined,
   diet: undefined,
   calculatedMacros: undefined,
@@ -51,6 +54,11 @@ export const useOnboardingStore = create<OnboardingStore>()(
       setGoal: (goal) =>
         set((state) => ({
           data: { ...state.data, goal },
+        })),
+
+      setActivity: (activity) =>
+        set((state) => ({
+          data: { ...state.data, activity },
         })),
 
       setLifestyle: (lifestyle) =>

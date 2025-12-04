@@ -7,6 +7,7 @@ import { z } from 'zod';
 // SCHEMAS CON MENSAJES EN ESPAÑOL
 // ============================================
 
+// STEP 1 — BIOMÉTRICOS
 export const biometricsSchema = z.object({
   age: z
     .number({
@@ -44,9 +45,10 @@ export const biometricsSchema = z.object({
     .min(5, 'Porcentaje mínimo: 5%')
     .max(50, 'Porcentaje máximo: 50%')
     .optional()
-    .or(z.literal(undefined)), // ✅ Permite vacío sin errores
+    .or(z.literal(undefined)),
 });
 
+// STEP 2 — OBJETIVO
 export const goalSchema = z.object({
   goalType: z.enum(['LOSE', 'GAIN', 'MAINTAIN', 'RECOMP'], {
     required_error: 'Selecciona tu objetivo',
@@ -68,16 +70,45 @@ export const goalSchema = z.object({
     .optional(),
 });
 
+// STEP 3 — ACTIVIDAD DIARIA (NEAT)
 export const activitySchema = z.object({
-  activityLevel: z.enum(['SEDENTARY','LIGHTLY_ACTIVE','MODERATELY_ACTIVE','VERY_ACTIVE','SUPER_ACTIVE']),
-  dailySteps: z.enum(['UNDER_3000','3K_6K','6K_10K','OVER_10K']).optional(),
-  sittingHours: z.enum(['LESS_THAN_4H','4H_6H','6H_8H','MORE_THAN_8H']).optional(),
-  workType: z.enum(['DESK','MIXED','ACTIVE','PHYSICAL']).optional(),
+  activityLevel: z.enum(
+    [
+      'SEDENTARY',
+      'LIGHTLY_ACTIVE',
+      'MODERATELY_ACTIVE',
+      'VERY_ACTIVE',
+      'SUPER_ACTIVE',
+    ],
+    {
+      required_error: 'Selecciona tu nivel de actividad diaria',
+      invalid_type_error: 'Selecciona una opción válida',
+    }
+  ),
+
+  dailySteps: z
+    .enum(['UNDER_3000', '3K_6K', '6K_10K', 'OVER_10K'])
+    .optional(),
+
+  sittingHours: z
+    .enum(['LESS_THAN_4H', '4H_6H', '6H_8H', 'MORE_THAN_8H'])
+    .optional(),
+
+  workType: z
+    .enum(['DESK', 'MIXED', 'ACTIVE', 'PHYSICAL'])
+    .optional(),
 });
 
+// STEP 4 — NIVEL DE ENTRENAMIENTO
 export const lifestyleSchema = z.object({
   activityLevel: z.enum(
-    ['SEDENTARY', 'LIGHTLY_ACTIVE', 'MODERATELY_ACTIVE', 'VERY_ACTIVE', 'EXTREMELY_ACTIVE'],
+    [
+      'SEDENTARY',
+      'LIGHTLY_ACTIVE',
+      'MODERATELY_ACTIVE',
+      'VERY_ACTIVE',
+      'EXTREMELY_ACTIVE',
+    ],
     {
       required_error: 'Selecciona tu nivel de actividad',
       invalid_type_error: 'Selecciona una opción válida',
@@ -98,11 +129,27 @@ export const lifestyleSchema = z.object({
     .optional(),
 });
 
+// STEP 5 — DIETA (ACTUALIZADO)
 export const dietSchema = z.object({
-  dietType: z.enum(['OMNIVORE', 'VEGETARIAN', 'VEGAN', 'KETO', 'PALEO'], {
-    required_error: 'Selecciona tu tipo de dieta',
-    invalid_type_error: 'Selecciona una opción válida',
-  }),
+  dietType: z.enum(
+    [
+      'NONE',
+      'OMNIVORE',
+      'VEGETARIAN',
+      'VEGAN',
+      'PESCETARIAN',
+      'KETO',
+      'PALEO',
+      'MEDITERRANEAN',
+      'LOW_CARB',
+      'CARNIVORE',
+      'OTHER',
+    ],
+    {
+      required_error: 'Selecciona tu tipo de dieta',
+      invalid_type_error: 'Selecciona una opción válida',
+    }
+  ),
 
   allergies: z.array(z.string()).optional(),
   excludedIngredients: z.array(z.string()).optional(),
@@ -119,7 +166,7 @@ export function useOnboardingForm<T extends z.ZodType>(
 ) {
   const form = useForm<z.infer<T>>({
     resolver: zodResolver(schema),
-    mode: 'onBlur', // Valida cuando el campo pierde foco
+    mode: 'onBlur',
   });
 
   const handleSubmitStore = form.handleSubmit(
