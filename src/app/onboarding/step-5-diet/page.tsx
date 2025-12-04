@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/Label';
 import { Select } from '@/components/ui/Select';
 import { useOnboardingStore } from '@/store/onboarding';
 
-const NEXT_PATH = '/onboarding/step-6-summary';
+const NEXT_PATH = '/onboarding/step-6-macros';
 const PREV_PATH = '/onboarding/step-4-training-level';
 
 const DIET_TYPES = [
