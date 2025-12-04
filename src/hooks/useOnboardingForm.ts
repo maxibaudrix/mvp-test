@@ -68,6 +68,13 @@ export const goalSchema = z.object({
     .optional(),
 });
 
+export const activitySchema = z.object({
+  activityLevel: z.enum(['SEDENTARY','LIGHTLY_ACTIVE','MODERATELY_ACTIVE','VERY_ACTIVE','SUPER_ACTIVE']),
+  dailySteps: z.enum(['UNDER_3000','3K_6K','6K_10K','OVER_10K']).optional(),
+  sittingHours: z.enum(['LESS_THAN_4H','4H_6H','6H_8H','MORE_THAN_8H']).optional(),
+  workType: z.enum(['DESK','MIXED','ACTIVE','PHYSICAL']).optional(),
+});
+
 export const lifestyleSchema = z.object({
   activityLevel: z.enum(
     ['SEDENTARY', 'LIGHTLY_ACTIVE', 'MODERATELY_ACTIVE', 'VERY_ACTIVE', 'EXTREMELY_ACTIVE'],
