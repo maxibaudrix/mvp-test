@@ -1,8 +1,9 @@
-
 // src/components/onboarding/StepButtons.tsx
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { CardFooter } from '@/components/ui/card';
-import Link from 'next/link';
+import { ArrowLeft, ArrowRight, Loader2, Check } from 'lucide-react';
 
 interface StepButtonsProps {
   currentStep: number;
@@ -13,37 +14,53 @@ interface StepButtonsProps {
   isLastStep: boolean;
 }
 
-const StepButtons: React.FC<StepButtonsProps> = ({
+export default function StepButtons({
   currentStep,
   nextPath,
   prevPath,
   isSubmitting,
   onNext,
   isLastStep,
-}) => {
+}: StepButtonsProps) {
+  const router = useRouter();
+
   return (
-    <CardFooter className="pt-6 justify-between">
-      {currentStep > 1 ? (
-        <Link href={prevPath} passHref>
-          <Button variant="outline" type="button" disabled={isSubmitting}>
-            &larr; Anterior
-          </Button>
-        </Link>
-      ) : (
-        <div /> // Placeholder para mantener el espacio
-      )}
-
+    <div className="flex justify-between pt-6 border-t border-slate-800 mt-8">
+      {/* Botón Anterior */}
       <Button
-        type="submit" // Siempre es un submit si está dentro de un <form>
-        onClick={onNext}
-        isLoading={isSubmitting}
+        type="button"
+        variant="outline"
+        onClick={() => router.push(prevPath)}
         disabled={isSubmitting}
+        className="bg-slate-900 border-slate-700 hover:bg-slate-800 text-white"
       >
-        {isLastStep ? 'Finalizar' : 'Siguiente &rarr;'}
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        {currentStep === 1 ? 'Cancelar' : 'Anterior'}
       </Button>
-    </CardFooter>
-  );
-};
 
-export default StepButtons;
-        
+      {/* Botón Siguiente/Finalizar */}
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/50 transition-all disabled:opacity-50"
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            {isLastStep ? 'Guardando...' : 'Procesando...'}
+          </>
+        ) : isLastStep ? (
+          <>
+            <Check className="w-4 h-4 mr-2" />
+            Finalizar
+          </>
+        ) : (
+          <>
+            Siguiente
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </>
+        )}
+      </Button>
+    </div>
+  );
+}
