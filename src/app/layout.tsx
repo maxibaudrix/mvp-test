@@ -40,7 +40,7 @@ export function PublicLayout({ children }: PublicLayoutProps) {
     <>
       <Header />
       {/* Contenido principal con padding para que el header fijo no lo cubra */}
-      <main className="min-h-screen pt-20 pb-20">
+      <main className="min-h-screen pt-16 pb-16">
         {children}
       </main>
       <Footer />
