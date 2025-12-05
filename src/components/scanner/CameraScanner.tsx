@@ -29,14 +29,13 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => 
         codeReaderRef.current.reset();
         codeReaderRef.current = null;
     }
-    // Aseguramos que la función onStop del padre se llama al finalizar
     onStop(); 
   }, [onStop]);
 
 
   // Lógica de escaneo continuo
   const startScan = useCallback(async () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current) return; // Primera comprobación de referencia
 
     try {
       setIsLoading(true);
@@ -51,10 +50,8 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => 
       }
       const codeReader = codeReaderRef.current;
 
-      // 3. Usamos la cámara predeterminada (null) para simplificar la inicialización
-      // Esto dispara el prompt de permisos del navegador inmediatamente.
+      // 3. Iniciar el escaneo usando la cámara predeterminada (null)
       codeReader.decodeFromVideoDevice(null, videoRef.current, (result: any, scanError: any) => {
-        setIsLoading(false); // Si llega aquí, al menos el stream se inició
         
         if (scanError) {
           if (scanError.name !== "NotFoundException") {
@@ -64,24 +61,23 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => 
         }
 
         if (result) {
-          // Extraemos el texto del resultado
           const decodedText = (result as any)?.getText ? (result as any).getText() : (result as any).text;
 
           if (decodedText && lastDetectedRef.current !== decodedText) {
             lastDetectedRef.current = decodedText;
             onDetected(decodedText);
-            
-            // Detener el escaneo después de una detección exitosa
             stopScan();
           }
         }
       });
       
-      // Si la función anterior no lanzó un error inmediatamente (ej. en caso de NotAllowedError), 
-      // el isLoading debería desactivarse cuando el video esté listo.
-      videoRef.current.onloadedmetadata = () => {
-        setIsLoading(false);
-      };
+      // 4. *** CORRECCIÓN CRÍTICA AQUÍ ***
+      // Comprobamos que el elemento de video todavía exista antes de asignarle el evento.
+      if (videoRef.current) {
+        videoRef.current.onloadedmetadata = () => {
+          setIsLoading(false);
+        };
+      }
 
     } catch (err: any) {
       setIsLoading(false);
@@ -98,19 +94,18 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => 
 
       setError(errorMessage);
     }
-  }, [onDetected, stopScan]); // Dependencia stopScan para evitar loop si se llama onDetected
+  }, [onDetected, stopScan]);
 
   useEffect(() => {
     startScan();
     
-    // Cleanup: Detener y resetear el lector al desmontar el componente
     return () => stopScan();
   }, [startScan, stopScan]);
 
 
   return (
     <div className="relative rounded-xl overflow-hidden bg-black min-h-[300px] shadow-2xl">
-      {/* Video Stream - transform scale-x-[-1] es para reflejar el video, como en un espejo */}
+      {/* Video Stream */}
       <video 
         ref={videoRef} 
         className="w-full h-full object-cover transform scale-x-[-1]" 
