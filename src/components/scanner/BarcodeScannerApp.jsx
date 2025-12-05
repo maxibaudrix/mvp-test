@@ -1,30 +1,13 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Camera, X, AlertCircle, CheckCircle, Loader2, Search, Package, Scan, RefreshCw, Zap } from 'lucide-react';
 
 // ====================================================================
-// 1. MOCK DATA Y TIPOS
+// 1. MOCK DATA (Simula la respuesta de una API)
 // ====================================================================
 
-/**
- * Definición de la estructura de datos para un producto.
- */
-interface ProductData {
-  name: string;
-  code: string;
-  nutriscoreGrade: 'A' | 'B' | 'C' | 'D' | 'E';
-  novaGroup: 1 | 2 | 3 | 4;
-  calories: number; // por 100g
-  protein: number; // por 100g
-  carbs: number; // por 100g
-  fat: number; // por 100g
-  brand: string;
-  sporvitScore: 'GREEN' | 'YELLOW' | 'RED'; // Score personalizado (Simulado)
-  scoreReason: string;
-  imageUrl: string;
-}
-
-// Mock de productos para simular una base de datos/API
-const MOCK_PRODUCTS: { [code: string]: ProductData } = {
+// Nota: Hemos eliminado la declaración 'interface ProductData' para evitar el error de TypeScript.
+// La estructura de los datos se infiere de este objeto.
+const MOCK_PRODUCTS = {
   '3017620422003': {
     name: 'Nutella',
     code: '3017620422003',
@@ -61,15 +44,15 @@ const MOCK_PRODUCTS: { [code: string]: ProductData } = {
 };
 
 // ====================================================================
-// 2. COMPONENTES AUXILIARES (Integrados)
+// 2. COMPONENTES AUXILIARES (Puro JSX)
 // ====================================================================
 
 /**
  * Componente que simula la tarjeta de un producto.
  */
-const ProductCard: React.FC<{ product: ProductData, onClose: () => void }> = ({ product, onClose }) => {
+const ProductCard = ({ product, onClose }) => {
   // Función para determinar el color de Nutri-Score
-  const getNutriscoreStyle = (grade: string) => {
+  const getNutriscoreStyle = (grade) => {
     switch (grade) {
       case 'A': return 'text-white bg-green-600';
       case 'B': return 'text-white bg-lime-500';
@@ -81,7 +64,7 @@ const ProductCard: React.FC<{ product: ProductData, onClose: () => void }> = ({ 
   };
 
   // Función para determinar el color de NOVA Group
-  const getNovaGroupStyle = (group: number) => {
+  const getNovaGroupStyle = (group) => {
     switch (group) {
       case 1: return 'text-green-500 border-green-500';
       case 2: return 'text-lime-500 border-lime-500';
@@ -92,7 +75,7 @@ const ProductCard: React.FC<{ product: ProductData, onClose: () => void }> = ({ 
   };
 
   // Función para determinar el estilo del Score Personalizado
-  const getSporvitScoreStyle = (score: string) => {
+  const getSporvitScoreStyle = (score) => {
     switch (score) {
       case 'GREEN': return 'bg-emerald-600';
       case 'YELLOW': return 'bg-yellow-500';
@@ -165,7 +148,7 @@ const ProductCard: React.FC<{ product: ProductData, onClose: () => void }> = ({ 
 /**
  * Componente que simula el área de la cámara/escáner.
  */
-const CameraPlaceholder: React.FC<{ onScan: (code: string) => void, onStop: () => void }> = ({ onScan, onStop }) => {
+const CameraPlaceholder = ({ onScan, onStop }) => {
     const [barcode, setBarcode] = useState('');
 
     const handleScan = () => {
@@ -239,15 +222,15 @@ const CameraPlaceholder: React.FC<{ onScan: (code: string) => void, onStop: () =
 // 3. COMPONENTE PRINCIPAL DE LA APLICACIÓN
 // ====================================================================
 
-const App: React.FC = () => {
+const App = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const [productData, setProductData] = useState<ProductData | null>(null);
+  const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [scannedCode, setScannedCode] = useState<string | null>(null);
+  const [error, setError] = useState(null);
+  const [scannedCode, setScannedCode] = useState(null);
 
   // Función simulada de API para buscar el producto
-  const fetchProduct = useCallback(async (code: string) => {
+  const fetchProduct = useCallback(async (code) => {
     setLoading(true);
     setError(null);
     setProductData(null);
@@ -261,13 +244,13 @@ const App: React.FC = () => {
       setProductData(product);
       setError(null);
     } else {
-      setError(`Código no encontrado: ${code}. Intenta con 3017620422003, 8410076472069, o 5449000000996.`);
+      setError(`Código no encontrado: ${code}. Intenta con ${Object.keys(MOCK_PRODUCTS).join(', ')}.`);
     }
     setLoading(false);
   }, []);
 
   // Manejador cuando el escáner detecta un código
-  const handleDetectedCode = useCallback((code: string) => {
+  const handleDetectedCode = useCallback((code) => {
     setScannedCode(code);
     setIsCameraActive(false); // Detener cámara al escanear
     fetchProduct(code);
@@ -285,7 +268,6 @@ const App: React.FC = () => {
   const stopScan = () => {
     setIsCameraActive(false);
     setLoading(false);
-    // Nota: El escáner real necesitaría un cleanup de la librería
   };
 
 
