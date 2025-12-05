@@ -39,13 +39,12 @@ export const biometricsSchema = z.object({
     .max(200, 'Peso máximo: 200 kg'),
 
   bodyFatPercentage: z
-    .number({
-      invalid_type_error: 'Ingresa un número válido',
-    })
-    .min(5, 'Porcentaje mínimo: 5%')
-    .max(50, 'Porcentaje máximo: 50%')
-    .optional()
-    .or(z.literal(undefined)),
+    .union([
+      z.number().min(5, 'Porcentaje mínimo: 5%').max(50, 'Porcentaje máximo: 50%'),
+      z.literal(undefined),
+      z.literal(null),
+    ])
+    .optional(),
 });
 
 // STEP 2 — OBJETIVO
