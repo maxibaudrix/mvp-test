@@ -88,7 +88,8 @@ export const activitySchema = z.object({
 
   dailySteps: z
     .enum(['UNDER_3000', '3K_6K', '6K_10K', 'OVER_10K'])
-    .optional(),
+    .optional()
+    .or(z.literal("")),
 
   sittingHours: z
     .enum(['LESS_THAN_4H', '4H_6H', '6H_8H', 'MORE_THAN_8H'])

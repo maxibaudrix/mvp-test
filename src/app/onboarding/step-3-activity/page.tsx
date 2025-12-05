@@ -13,10 +13,10 @@ const NEXT_PATH = '/onboarding/step-4-training-level';
 const PREV_PATH = '/onboarding/step-2-goal';
 
 const ACTIVITY_LEVELS = [
-  { value: 'SEDENTARY', label: 'Sedentario (menos de 4k pasos)' },
-  { value: 'LIGHTLY_ACTIVE', label: 'Ligeramente activo (4k–7k pasos)' },
-  { value: 'MODERATELY_ACTIVE', label: 'Moderadamente activo (7k–10k pasos)' },
-  { value: 'VERY_ACTIVE', label: 'Muy activo (más de 10k pasos)' },
+  { value: 'SEDENTARY', label: 'Sedentario (trabajo de oficina, poco movimiento)' },
+  { value: 'LIGHTLY_ACTIVE', label: 'Ligeramente activo (oficina y tareas diarias)' },
+  { value: 'MODERATELY_ACTIVE', label: 'Moderadamente activo (trabajo mixto)' },
+  { value: 'VERY_ACTIVE', label: 'Muy activo (trabajo físico)' },
   { value: 'SUPER_ACTIVE', label: 'Súper activo (trabajo físico intenso)' },
 ];
 
@@ -34,12 +34,6 @@ const SITTING_HOURS = [
   { value: 'MORE_THAN_8H', label: '> 8 horas sentado' },
 ];
 
-const WORK_TYPES = [
-  { value: 'DESK', label: 'Trabajo de oficina (sedentario)' },
-  { value: 'MIXED', label: 'Trabajo mixto / algo de movimiento' },
-  { value: 'ACTIVE', label: 'Trabajo activo (caminatas frecuentes)' },
-  { value: 'PHYSICAL', label: 'Trabajo físico intenso' },
-];
 
 export default function Step3ActivityPage() {
   const router = useRouter();
@@ -112,7 +106,7 @@ export default function Step3ActivityPage() {
               {/* PASOS DIARIOS (OPCIONAL) */}
               <div>
                 <Label className="mb-3 block">
-                  Pasos Diarios Promedio (Opcional)
+                  Pasos Diarios Promedio 
                 </Label>
 
                 <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
@@ -161,34 +155,6 @@ export default function Step3ActivityPage() {
                         id={item.value}
                         value={item.value}
                         {...register('sittingHours')}
-                        className="sr-only"
-                      />
-                      {item.label}
-                    </Label>
-                  ))}
-                </div>
-              </div>
-
-              {/* TIPO DE TRABAJO (OPCIONAL) */}
-              <div>
-                <Label className="mb-3 block">Tipo de Trabajo (Opcional)</Label>
-
-                <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
-                  {WORK_TYPES.map((item) => (
-                    <Label
-                      key={item.value}
-                      htmlFor={item.value}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all text-center ${
-                        workType === item.value
-                          ? 'bg-emerald-500/30 border-emerald-600 text-emerald-300 shadow-md'
-                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        id={item.value}
-                        value={item.value}
-                        {...register('workType')}
                         className="sr-only"
                       />
                       {item.label}
