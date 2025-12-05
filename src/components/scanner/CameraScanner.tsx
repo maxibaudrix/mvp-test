@@ -35,7 +35,7 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => 
 
   // Lógica de escaneo continuo
   const startScan = useCallback(async () => {
-    if (!videoRef.current) return; // Primera comprobación de referencia
+    if (!videoRef.current) return;
 
     try {
       setIsLoading(true);
@@ -71,11 +71,14 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => 
         }
       });
       
-      // 4. *** CORRECCIÓN CRÍTICA AQUÍ ***
-      // Comprobamos que el elemento de video todavía exista antes de asignarle el evento.
+      // 4. Desactivar la carga cuando se inicie la reproducción del video
+      // Esto es más fiable que onloadedmetadata para saber cuándo el usuario ve algo.
       if (videoRef.current) {
-        videoRef.current.onloadedmetadata = () => {
-          setIsLoading(false);
+        // Limpiamos el error anterior que teníamos
+        videoRef.current.onloadedmetadata = null; 
+        
+        videoRef.current.oncanplay = () => {
+            setIsLoading(false);
         };
       }
 
@@ -105,12 +108,13 @@ const CameraScanner: React.FC<CameraScannerProps> = ({ onDetected, onStop }) => 
 
   return (
     <div className="relative rounded-xl overflow-hidden bg-black min-h-[300px] shadow-2xl">
-      {/* Video Stream */}
+      {/* Video Stream - AÑADIDO 'autoPlay' para forzar el inicio de la reproducción */}
       <video 
         ref={videoRef} 
         className="w-full h-full object-cover transform scale-x-[-1]" 
         playsInline 
         muted 
+        autoPlay={true}
       />
       
       {/* Overlay de Carga */}
