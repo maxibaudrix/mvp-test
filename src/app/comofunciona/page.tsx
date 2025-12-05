@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-emerald-500/30">
       
-    <main className="pt-32 pb-20">
+    <main className="pt-16 pb-16">
 
         {/* --- HERO --- */}
         <section className="container mx-auto px-6 text-center mb-24 max-w-4xl">
