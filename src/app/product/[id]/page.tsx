@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: Props) {
         <h1 className="text-2xl font-bold mb-2">{product.product_name || "Producto"}</h1>
         <p className="text-sm text-muted-foreground mb-4">{product.brands}</p>
 
-        <ProductCard product={product} score={score} onOpen={() => {}} />
+        <ProductCard product={product} score={score} onOpen={() => {}} onClose={() => {}} />
 
         <section className="mt-6">
           <h2 className="text-lg font-semibold">Información nutricional</h2>
