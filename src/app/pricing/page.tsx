@@ -60,8 +60,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-emerald-500/30">
-      <Header />
-
+      
       <main className="pt-32 pb-20 px-4 container mx-auto">
         
         {/* Hero Section */}
@@ -145,8 +144,6 @@ export default function PricingPage() {
         </div>
 
       </main>
-
-      <Footer />
     </div>
   );
 }
