@@ -82,7 +82,7 @@ const SporvitRegister = () => {
 
   return (
     // MODIFICACIÓN 1: Eliminar bg-gray-50 para usar el fondo del layout.
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-start justify-center p-4 pt-16">
       {/* MODIFICACIÓN 2: Usar bg-slate-800 y border-slate-700 para la tarjeta */}
       <div className="w-full max-w-md bg-slate-800 p-8 sm:p-10 rounded-3xl shadow-2xl border border-slate-700">
         <div className="text-center mb-8">
