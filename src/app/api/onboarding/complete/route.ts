@@ -1,13 +1,12 @@
 // src/app/api/onboarding/complete/route.ts
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth/auth-options";
-import { authOptions } from "@/lib/auth/auth-options";
+import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
     // 1) Validar usuario autenticado
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: "No autorizado. Inicia sesión nuevamente." },
