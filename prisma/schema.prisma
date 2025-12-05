@@ -18,8 +18,8 @@ model User {
   emailVerified DateTime?
   name          String?
   image         String?
-  password      String?   // Para auth con credenciales
-  
+  password      String? // Para auth con credenciales
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -35,12 +35,12 @@ model User {
   recipes         Recipe[]
 
   // ADDED RELATIONS
-  weightEntries   WeightEntry[]      // For WeightEntry
-  measurements    BodyMeasurement[]  // For BodyMeasurement
-  progressPhotos  ProgressPhoto[]    // For ProgressPhoto
-  diaryMeals      DiaryMeal[]        // For DiaryMeal
-  plannedMeals    PlannedMeal[]      // For PlannedMeal
-  dailyWater      DailyWater[]       // For DailyWater
+  weightEntries  WeightEntry[] // For WeightEntry
+  measurements   BodyMeasurement[] // For BodyMeasurement
+  progressPhotos ProgressPhoto[] // For ProgressPhoto
+  diaryMeals     DiaryMeal[] // For DiaryMeal
+  plannedMeals   PlannedMeal[] // For PlannedMeal
+  dailyWater     DailyWater[] // For DailyWater
 }
 
 model Account {
@@ -88,10 +88,10 @@ model UserProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Biometrics
-  age           Int
-  gender        String // male, female, other
-  heightCm      Float
-  currentWeight Float
+  age               Int
+  gender            String // male, female, other
+  heightCm          Float
+  currentWeight     Float
   bodyFatPercentage Float?
 
   // Activity
@@ -99,15 +99,15 @@ model UserProfile {
   workoutDaysPerWeek Int    @default(0)
 
   // Activity
-  dailySteps   String?    // under 3k, 3-6k, 6-10k, 10k+
-  sittingHours String?    // <4h, 4-6h, 6-8h, 8+
-  workType     String?    // desk, mixed, active, physical
+  dailySteps   String? // under 3k, 3-6k, 6-10k, 10k+
+  sittingHours String? // <4h, 4-6h, 6-8h, 8+
+  workType     String? // desk, mixed, active, physical
 
   //  Training Level
-  trainingLevel   String?     // beginner, intermediate, advanced
-  trainingTypes   String?     // JSON: ["strength","cardio","mobility"]
-  sessionDuration Int?        // in minutes
-  intensity       String?     // low, moderate, high
+  trainingLevel   String? // beginner, intermediate, advanced
+  trainingTypes   String? // JSON: ["strength","cardio","mobility"]
+  sessionDuration Int? // in minutes
+  intensity       String? // low, moderate, high
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -127,8 +127,8 @@ model UserGoals {
   dietType            String? // omnivore, vegetarian, vegan, keto, paleo
   allergies           String?
   excludedIngredients String?
-  
-  targetDate   DateTime?
+
+  targetDate DateTime?
 
   // Calculated targets
   targetCalories Int
@@ -266,6 +266,7 @@ model ProgressTracking {
 
   @@index([userId, date])
 }
+
 model WeightEntry {
   id        String   @id @default(uuid())
   userId    String
@@ -297,7 +298,7 @@ model ProgressPhoto {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   date      DateTime
-  type      String   // front, side, back
+  type      String // front, side, back
   imageUrl  String
   createdAt DateTime @default(now())
 
@@ -322,9 +323,9 @@ model Recipe {
   cookTimeMinutes    Int?
 
   // AGREGAR ESTOS CAMPOS DE MACRONUTRIENTES
-  protein            Float // En gramos
-  carbs              Float // En gramos
-  fats               Float // En gramos
+  protein Float // En gramos
+  carbs   Float // En gramos
+  fats    Float // En gramos
 
   favorited Boolean @default(false)
   rating    Int?
@@ -337,15 +338,15 @@ model Recipe {
 // NOTA: Se asume que los modelos `User` y `ScannedProduct` ya existen.
 
 model DiaryMeal {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  user        User           @relation(fields: [userId], references: [id])
   date        DateTime // Fecha en la que se consume la comida (solo la fecha, la hora está en createdAt)
-  mealType    String   // breakfast, lunch, dinner, snacks
+  mealType    String // breakfast, lunch, dinner, snacks
   productId   String
   product     ScannedProduct @relation(fields: [productId], references: [id])
-  servingSize Float    // gramos
-  createdAt   DateTime @default(now()) // Hora exacta de registro
+  servingSize Float // gramos
+  createdAt   DateTime       @default(now()) // Hora exacta de registro
 
   @@index([userId, date])
 }
@@ -355,35 +356,34 @@ model DiaryMeal {
 // ============================================\
 
 model PlannedMeal {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Identificador de la semana (e.g., "2024-W40" o la fecha de inicio de la semana)
-  week      String   
-  
+  week String
+
   // Almacena el array WeeklyPlan.plan (el detalle de las comidas de 7 días)
-  planJson  String    
-  
+  planJson String
+
   // Almacena el objeto WeeklyPlan.weeklyStats (calorías y macros promedio)
-  statsJson String     
-  
+  statsJson String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // **CRUCIAL**: Asegura que un usuario solo tenga un plan por semana.
-  @@unique([userId, week]) 
-  
+  @@unique([userId, week])
   // Asegura una búsqueda rápida por usuario y semana
-  @@index([userId, week]) 
+  @@index([userId, week])
 }
 
 model DailyWater {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  date      DateTime @unique // Único por usuario y fecha
-  glasses   Int      @default(0)
+  id      String   @id @default(uuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id])
+  date    DateTime @unique // Único por usuario y fecha
+  glasses Int      @default(0)
 
   @@index([userId, date])
 }
