@@ -2,6 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Camera, Dumbbell, Brain, ChevronRight, Check, Menu, X, Star, TrendingUp, Zap, Target, Calendar, BarChart3, Award, Users, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 const SporvitLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -461,7 +462,7 @@ const SporvitLanding = () => {
           </div>
 
           <div className="text-center mt-12 text-slate-400">
-            <p>¿Eres empresa o profesional? <a href="/business" className="text-emerald-400 hover:underline">Ver planes B2B</a></p>
+            <p>¿Eres empresa o profesional? <Link href="/under-construction" className="text-emerald-400 hover:underline">Ver planes B2B</Link></p>
           </div>
         </div>
       </section>

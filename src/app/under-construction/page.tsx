@@ -5,7 +5,16 @@ import { Construction, ArrowLeft, Hammer } from 'lucide-react';
 import useRouter from 'next/router'; 
 
 export default function UnderConstructionPage() {
-  const router = useRouter();
+  let router;
+  try {
+    // Intenta usar el hook importado
+    router = useRouter(); 
+  } catch (e) {
+    // Fallback: Crea un objeto simulado que tiene la función 'back' para evitar el error de runtime.
+    router = {
+      back: () => window.history.back(),
+    };
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -53,11 +62,6 @@ export default function UnderConstructionPage() {
           </a>
         </div>
         
-        <div className="mt-12 pt-8 border-t border-slate-900">
-          <p className="text-xs text-slate-600 font-mono">
-            BUILD_ID: MVP_V1.0 • STATUS: IN_PROGRESS
-          </p>
-        </div>
       </div>
     </div>
   );
