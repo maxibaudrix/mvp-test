@@ -99,15 +99,15 @@ model UserProfile {
   workoutDaysPerWeek Int    @default(0)
 
   // Activity
-  dailySteps   String? // under 3k, 3-6k, 6-10k, 10k+
-  sittingHours String? // <4h, 4-6h, 6-8h, 8+
-  workType     String? // desk, mixed, active, physical
+  dailySteps   String?
+  sittingHours String?
+  workType     String?
 
   //  Training Level
-  trainingLevel   String? // beginner, intermediate, advanced
-  trainingTypes   String? // JSON: ["strength","cardio","mobility"]
-  sessionDuration Int? // in minutes
-  intensity       String? // low, moderate, high
+  trainingLevel   String?
+  trainingTypes   String?
+  sessionDuration Int?
+  intensity       String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
