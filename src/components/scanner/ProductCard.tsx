@@ -17,7 +17,7 @@ interface ProductData {
 interface ProductCardProps {
     product: ProductData;
     score?: number | null; // <-- agregado
-    onOpen: () => void;
+    onOpen?: () => void;
     onClose: () => void;    // <-- renombrado
 }
 
@@ -28,7 +28,7 @@ const Card: React.FC<{ children: React.ReactNode; className?: string }> = ({ chi
   </div>
 );
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, score, onOpen }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, score, onOpen, onClose }) => {
     let nutriscoreColor = 'text-gray-600 bg-gray-200';
     if (product.nutriscoreGrade === 'A') nutriscoreColor = 'text-white bg-green-600';
     else if (product.nutriscoreGrade === 'B') nutriscoreColor = 'text-white bg-lime-500';
@@ -45,9 +45,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, score, onOpen }) => 
     return (
         <Card className="p-4 border-l-4 border-green-500 bg-white dark:bg-gray-800 relative">
             <button
-                onClick={onOpen}
+                onClick={onClose} // Esto ahora es seguro
                 className="absolute top-3 right-3 p-1 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Abrir detalles"
+                aria-label="Cerrar detalles"
             >
                 &times;
             </button>

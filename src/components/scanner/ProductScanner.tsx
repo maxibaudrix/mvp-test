@@ -92,41 +92,35 @@ export default function ProductScanner() {
         setIsCameraActive(false); // Detener cámara al empezar a buscar
 
         try {
-            // A. Llamada a OpenFoodFacts
-            const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json`);
+            // --- CAMBIO: Llamada a TU API (Next.js API Route) ---
+            const response = await fetch('/api/scanner', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    barcode: code,
+                    // Aquí podrías inyectar preferencias reales del usuario si las tuvieras
+                    prefs: { goal: 'muscle' } 
+                })
+            });
+
             const data = await response.json();
 
-            if (data.status === 0 || !data.product) {
-                throw new Error("Producto no encontrado en la base de datos.");
+            if (!response.ok) {
+                // Manejar errores que vienen de tu API (ej. 404 product_not_found)
+                throw new Error(data.error || "Error al obtener el producto");
             }
 
-            const processedProduct = processProductData(data.product);
-            setProductData(processedProduct);
-
-            // B. (Opcional) Llamada a tu Backend para el Score
-            // Descomenta esto cuando tengas tu backend listo en /api/scanner
-            /*
-            try {
-                const scoreRes = await fetch('/api/scanner', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ barcode: code, productData: processedProduct })
-                });
-                if (scoreRes.ok) {
-                    const scoreJson = await scoreRes.json();
-                    setSporvitScore(scoreJson.score);
-                }
-            } catch (err) {
-                console.warn("No se pudo calcular el score personalizado", err);
-            }
-            */
+            // data.product es el objeto raw de OpenFoodFacts
+            // data.score es el número calculado por tu backend
             
-            // Simulación temporal del Score (eliminar al conectar backend)
-            setSporvitScore(Math.floor(Math.random() * 100)); 
+            const processedProduct = processProductData(data.product);
+            
+            setProductData(processedProduct);
+            setSporvitScore(data.score); // Usamos el score real del backend
 
         } catch (err: any) {
             console.error(err);
-            setError(err.message || "Error de conexión al buscar el producto.");
+            setError(err.message || "Error de conexión.");
         } finally {
             setLoading(false);
         }
