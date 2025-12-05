@@ -1,7 +1,7 @@
 // src/app/api/scanner/scan/route.ts
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/auth-options'
+import NextAuth from 'next-auth';ib/auth/auth-options'
 
 // Note: For production, you'll need to integrate a proper OCR service
 // Options: Google Cloud Vision API, AWS Textract, Tesseract.js, ZXing

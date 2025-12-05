@@ -1,16 +1,15 @@
 // src/  
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/auth-options'
-import { prisma } from '@/lib/prisma'
-import { offClient } from '@/lib/openfoodfacts/client'
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth'; // ⬅️ ¡CORRECCIÓN CLAVE! Importa 'auth' desde tu archivo de configuración
+import prisma from '@/lib/prisma';
+import { offClient } from '@/lib/openfoodfacts/client';
 
 export async function GET(
   request: Request,
   { params }: { params: { barcode: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -249,4 +248,8 @@ function calculateVerdict(
     reason: 'Basado en tu perfil nutricional',
     fitsUserGoal: score >= 0,
   }
+}
+
+function getServerSession(NextAuth: unknown) {
+  throw new Error('Function not implemented.');
 }

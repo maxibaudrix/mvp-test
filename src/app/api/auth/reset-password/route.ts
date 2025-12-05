@@ -1,6 +1,6 @@
 // src/app/api/auth/reset-password/route.ts
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import prisma  from '@/lib/prisma'
 import {
   verifyPasswordResetToken,
   deletePasswordResetToken,

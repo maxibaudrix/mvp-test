@@ -1,6 +1,6 @@
 // src/app/api/auth/forgot-password/route.ts
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import prisma  from '@/lib/prisma'
 import { generatePasswordResetToken } from '@/lib/auth/tokens'
 import { sendEmail } from '@/lib/email/send-email'
 import ResetPasswordEmail from '@/lib/email/templates/reset-password'

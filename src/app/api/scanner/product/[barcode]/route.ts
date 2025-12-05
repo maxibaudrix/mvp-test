@@ -1,8 +1,8 @@
 // src/  
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth/auth-options'
-import { prisma } from '@/lib/prisma'
+import NextAuth from 'next-auth';ib/auth/auth-options'
+import prisma  from '@/lib/prisma'
 import { offClient } from '@/lib/openfoodfacts/client'
 
 export async function GET(

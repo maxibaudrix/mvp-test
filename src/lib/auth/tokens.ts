@@ -1,6 +1,6 @@
 // src/lib/auth/tokens.ts
 import { randomBytes } from 'crypto'
-import { prisma } from '@/lib/prisma'
+import prisma  from '@/lib/prisma'
 
 const TOKEN_EXPIRY_HOURS = 1 // 1 hora para reset de contraseña
 
