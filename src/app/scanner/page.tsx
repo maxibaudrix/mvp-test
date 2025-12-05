@@ -3,7 +3,7 @@
 
 import React from "react";
 // Importa el componente orquestador que ya tiene TODA la lógica, estado y UI.
-import ProductScanner from "@/components/scanner/ProductScanner"; 
+import ProductScanner from "@/components/scanner/ProductScanner2"; 
 
 export default function ScannerRoutePage() {
   // Toda la lógica de estado (scannedCode, product, loading) ahora reside
