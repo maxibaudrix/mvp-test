@@ -1,7 +1,7 @@
 // src/app/api/scanner/scan/route.ts
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import NextAuth from 'next-auth';ib/auth/auth-options'
+import { auth } from '@/lib/auth';
+
 
 // Note: For production, you'll need to integrate a proper OCR service
 // Options: Google Cloud Vision API, AWS Textract, Tesseract.js, ZXing
@@ -9,7 +9,7 @@ import NextAuth from 'next-auth';ib/auth/auth-options'
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json(
