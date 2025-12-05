@@ -1,4 +1,4 @@
-// src/app/progress/page  
+// src/app/page  
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Camera, Dumbbell, Brain, ChevronRight, Check, Menu, X, Star, TrendingUp, Zap, Target, Calendar, BarChart3, Award, Users, ArrowRight } from 'lucide-react';
