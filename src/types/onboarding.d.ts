@@ -31,11 +31,9 @@ export interface ActivityData {
     | 'VERY_ACTIVE'
     | 'SUPER_ACTIVE';
 
-  dailySteps?: 'UNDER_3000' | '3K_6K' | '6K_10K' | 'OVER_10K';
+  sittingHours?: "" | "LESS_THAN_4H" | "4H_6H" | "6H_8H" | "MORE_THAN_8H";
 
-  sittingHours?: 'LESS_THAN_4H' | '4H_6H' | '6H_8H' | 'MORE_THAN_8H';
-
-  workType?: 'DESK' | 'MIXED' | 'ACTIVE' | 'PHYSICAL';
+  workType?: "" | "DESK" | "MIXED" | "ACTIVE" | "PHYSICAL";
 }
 
 // ============================================
