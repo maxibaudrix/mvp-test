@@ -10,9 +10,6 @@ import bcrypt from "bcryptjs";
 
 export const authConfig = {
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt",
-  },
   pages: {
     signIn: "/login",
     newUser: "/onboarding/step-1-biometrics", // Redirige aquí después del registro
@@ -53,8 +50,8 @@ export const authConfig = {
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password // Ahora TypeScript sabe que NO es null
+          credentials.password as string,
+          user.password! // Ahora TypeScript sabe que NO es null
         );
 
         if (!isPasswordValid) {
