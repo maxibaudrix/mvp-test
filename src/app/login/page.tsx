@@ -7,7 +7,7 @@ import {
     Loader, ArrowRight, Chrome
 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 const SporvitLogin = () => {
     const router = useRouter();
@@ -48,8 +48,7 @@ const SporvitLogin = () => {
 
             // Login exitoso - redirigir al dashboard
             router.push('/dashboard');
-            router.refresh();
-        } catch (err) {
+            } catch (err) {
             setError('Error al iniciar sesión. Intenta de nuevo.');
             setIsLoading(false);
         }

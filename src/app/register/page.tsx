@@ -95,8 +95,7 @@ const SporvitRegister = () => {
 
       // Redirigir al onboarding
       router.push('/onboarding/step-1-biometrics');
-      router.refresh();
-
+      
     } catch (err: any) {
         setError(err.message || 'Error al registrar usuario');
         setIsLoading(false);

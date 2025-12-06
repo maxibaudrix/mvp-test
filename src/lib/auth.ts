@@ -8,7 +8,7 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 
 
-export const config: NextAuthConfig = {
+export const authConfig = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
@@ -37,19 +37,20 @@ export const config: NextAuthConfig = {
           throw new Error("Credenciales inválidas");
         }
 
-        // Buscar usuario
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { 
+            email: credentials.email as string 
+          },
         });
 
         if (!user || !user.password) {
           throw new Error("Usuario no encontrado");
         }
 
-        // Verificar contraseña
+        // ✅ FIX PRINCIPAL: Cast explícito de user.password
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
-          user.password
+          user.password as string // ← AÑADIR "as string"
         );
 
         if (!isPasswordValid) {
@@ -58,11 +59,11 @@ export const config: NextAuthConfig = {
 
         return {
           id: user.id,
-          email: user.email,
+          email: user.email!,
           name: user.name,
           image: user.image,
         };
-      },
+      }
     }),
   ],
   callbacks: {
