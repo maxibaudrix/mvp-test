@@ -48,9 +48,13 @@ export const authConfig = {
         }
 
         // ✅ FIX PRINCIPAL: Cast explícito de user.password
+        if (!user.password) {
+          throw new Error("Usuario sin contraseña configurada");
+        }
+
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
-          user.password as string // ← AÑADIR "as string"
+          user.password // Ahora TypeScript sabe que NO es null
         );
 
         if (!isPasswordValid) {
@@ -67,20 +71,20 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account }: any) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       if (session.user) {
         session.user.id = token.id as string;
       }
       return session;
     },
     // Redirigir usuarios nuevos al onboarding
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile }: any) {
       if (account?.provider === "google") {
         // Verificar si es la primera vez que inicia sesión
         const existingUser = await prisma.user.findUnique({
