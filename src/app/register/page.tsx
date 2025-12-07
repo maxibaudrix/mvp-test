@@ -38,6 +38,70 @@ const SporvitRegister = () => {
 
   const strength = passwordStrength(formData.password);
 
+  const registerUser = async () => {
+    setIsLoading(true);
+    setError('');
+
+    // Validaciones
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden.');
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.acceptTerms) {
+      setError('Debes aceptar los términos y condiciones.');
+      setIsLoading(false);
+      return;
+    }
+    if (formData.password.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres.');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      console.log('Enviando registro...', formData);
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error || 'Error al registrar usuario');
+      }
+
+      // Login automático
+      const signInResult = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        throw new Error('Usuario creado pero error al iniciar sesión');
+      }
+
+      // Redirigir al onboarding
+      router.push('/onboarding/step-1-biometrics');
+    } catch (err: any) {
+      setError(err.message || 'Error al registrar usuario');
+      setIsLoading(false);
+    }
+  };
+
+  // Handler directo para el botón (evita submit nativo)
+  const handleButtonClick = async () => {
+    await registerUser();
+  };
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -335,7 +399,8 @@ const SporvitRegister = () => {
 
           {/* Submit Button */}
           <button
-            type="submit"
+            type="button"                 // <-- importante: evita submit nativo
+            onClick={handleButtonClick}    // <-- ejecuta la misma lógica
             disabled={isLoading}
             className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-emerald-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-white mt-6"
           >
@@ -351,6 +416,7 @@ const SporvitRegister = () => {
               </>
             )}
           </button>
+
         </form>
 
         {/* Login Link */}
