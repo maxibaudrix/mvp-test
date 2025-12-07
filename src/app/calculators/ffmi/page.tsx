@@ -72,7 +72,7 @@ export default function FFMICalculatorPage() {
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-emerald-500/30">
       
 
-      <main className="pt-32 pb-20 container mx-auto px-4 sm:px-6 max-w-5xl">
+      <main className="pt-16 pb-16 container mx-auto px-4 sm:px-6 max-w-5xl">
         
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">

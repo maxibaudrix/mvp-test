@@ -64,7 +64,7 @@ export default function CalculatorsHubPage() {
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-emerald-500/30">
       <Header />
 
-      <main className="pt-32 pb-20 container mx-auto px-4 sm:px-6 max-w-7xl">
+      <main className="pt-16 pb-16 container mx-auto px-4 sm:px-6 max-w-7xl">
         
         {/* Header */}
         <div className="text-center mb-20 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">

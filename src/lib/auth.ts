@@ -1,10 +1,7 @@
-import { type NextAuthConfig } from "next-auth"
-import NextAuth from "next-auth"
-import Google from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "./db"
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "./db";
 import bcrypt from "bcryptjs";
 
 
