@@ -27,6 +27,8 @@ export async function POST(req: Request) {
 
     // 2) Obtener datos enviados desde Step 6
     const body = await req.json();
+    console.log("BODY RECEIVED →", JSON.stringify(body, null, 2));
+
     const {
       biometrics,
       goal,
