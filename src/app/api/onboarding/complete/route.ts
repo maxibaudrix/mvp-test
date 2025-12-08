@@ -46,6 +46,16 @@ export async function POST(req: Request) {
       );
     }
 
+    const mapSessionDuration = (value: string) => {
+      const mapping: Record<string, number> = {
+        "30_45": 30,
+        "45_60": 45,
+        "60_90": 60,
+        "90_120": 90
+      };
+      return mapping[value] ?? null;
+    };
+
     // 4) GUARDAR / ACTUALIZAR USER PROFILE (Biometrics + Activity + Training)
     await prisma.userProfile.upsert({
       where: { userId: user.id },
@@ -66,7 +76,7 @@ export async function POST(req: Request) {
         // Training (step 4)
         trainingLevel: training.trainingLevel,
         trainingTypes: JSON.stringify(training.trainingTypes ?? []),
-        sessionDuration: training.sessionDuration ?? null,
+        sessionDuration: mapSessionDuration(body.training.sessionDuration),
         intensity: training.intensity ?? null,
         workoutDaysPerWeek: training.trainingFrequency ?? 0,
       },
