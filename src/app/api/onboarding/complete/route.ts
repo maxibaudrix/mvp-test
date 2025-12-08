@@ -99,10 +99,11 @@ export async function POST(req: Request) {
         // Training
         trainingLevel: training.trainingLevel,
         trainingTypes: JSON.stringify(training.trainingTypes ?? []),
-        sessionDuration: training.sessionDuration ?? null,
+        sessionDuration: mapSessionDuration(training.sessionDuration), // ✅ FIX
         intensity: training.intensity ?? null,
         workoutDaysPerWeek: training.trainingFrequency ?? 0,
       },
+
     });
 
     // 5) GUARDAR / ACTUALIZAR USER GOALS (Objetivos + Dieta + Macros)
