@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./db";
 import bcrypt from "bcryptjs";
+import NextAuth from "next-auth";
 
 
 export const authConfig = {
@@ -97,3 +98,5 @@ export const authConfig = {
   },
   debug: process.env.NODE_ENV === 'development',
 };
+
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
