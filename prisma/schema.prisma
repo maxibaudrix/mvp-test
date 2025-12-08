@@ -105,7 +105,7 @@ model UserProfile {
 
   //  Training Level
   trainingLevel   String?
-  trainingTypes   String?
+  trainingTypes   String[]
   sessionDuration Int?
   intensity       String?
 

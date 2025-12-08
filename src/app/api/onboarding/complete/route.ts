@@ -98,7 +98,7 @@ export async function POST(req: Request) {
 
         // Training
         trainingLevel: training.trainingLevel,
-        trainingTypes: JSON.stringify(training.trainingTypes ?? []),
+        trainingTypes: training.trainingTypes ?? [],
         sessionDuration: mapSessionDuration(training.sessionDuration), // ✅ FIX
         intensity: training.intensity ?? null,
         workoutDaysPerWeek: training.trainingFrequency ?? 0,
