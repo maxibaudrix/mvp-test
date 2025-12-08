@@ -5,6 +5,7 @@ export interface LogoProps {
   variant?: 'full' | 'symbol' | 'wordmark';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   colorScheme?: 'default' | 'white' | 'black' | 'gradient';
+  showText?: boolean;
   className?: string;
 }
 
