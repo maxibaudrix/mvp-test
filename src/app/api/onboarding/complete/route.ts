@@ -35,11 +35,11 @@ export async function POST(req: Request) {
       activity,
       training,
       diet,
-      calculatedMacros,
+      macros,
     } = body;
 
     // 3) VALIDACIONES SIMPLES (opcional, más seguridad)
-    if (!biometrics || !goal || !activity || !training || !diet || !calculatedMacros) {
+    if (!biometrics || !goal || !activity || !training || !diet || !macros) {
       return NextResponse.json(
         { error: "Faltan datos del onboarding." },
         { status: 400 }
@@ -110,14 +110,14 @@ export async function POST(req: Request) {
         excludedIngredients: JSON.stringify(diet.excludedIngredients ?? []),
 
         // Macros calculados
-        targetCalories: calculatedMacros.targetCalories,
-        targetProteinG: calculatedMacros.protein,
-        targetCarbsG: calculatedMacros.carbs,
-        targetFatG: calculatedMacros.fats,
+        targetCalories: macros.targetCalories,
+        targetProteinG: macros.protein,
+        targetCarbsG: macros.carbs,
+        targetFatG: macros.fats,
 
         // Metabolismo
-        bmr: calculatedMacros.bmr,
-        tdee: calculatedMacros.tdee,
+        bmr: macros.bmr,
+        tdee: macros.tdee,
       },
       create: {
         userId: user.id,
@@ -133,14 +133,14 @@ export async function POST(req: Request) {
         excludedIngredients: JSON.stringify(diet.excludedIngredients ?? []),
 
         // Macros calculados
-        targetCalories: calculatedMacros.targetCalories,
-        targetProteinG: calculatedMacros.protein,
-        targetCarbsG: calculatedMacros.carbs,
-        targetFatG: calculatedMacros.fats,
+        targetCalories: macros.targetCalories,
+        targetProteinG: macros.protein,
+        targetCarbsG: macros.carbs,
+        targetFatG: macros.fats,
 
         // Metabolismo
-        bmr: calculatedMacros.bmr,
-        tdee: calculatedMacros.tdee,
+        bmr: macros.bmr,
+        tdee: macros.tdee,
       },
     });
 
