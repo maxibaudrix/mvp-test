@@ -56,55 +56,62 @@ export async function POST(req: Request) {
       return mapping[value] ?? null;
     };
 
+    const mapTrainingFrequency = (value: string) => {
+      const mapping: Record<string, number> = {
+        "1_2": 2,
+        "2_3": 3,
+        "3_4": 4,
+        "4_5": 5,
+        "5_6": 6,
+        "6_7": 7
+      };
+      return mapping[value] ?? 0;
+    };
+
+
     // 4) GUARDAR / ACTUALIZAR USER PROFILE (Biometrics + Activity + Training)
     await prisma.userProfile.upsert({
-      where: { userId: user.id },
-      update: {
-        // Biometrics
-        age: biometrics.age,
-        gender: biometrics.gender,
-        heightCm: biometrics.height,
-        currentWeight: biometrics.weight,
-        bodyFatPercentage: biometrics.bodyFatPercentage ?? null,
+  where: { userId: user.id },
+  update: {
+    age: biometrics.age,
+    gender: biometrics.gender,
+    heightCm: biometrics.height,
+    currentWeight: biometrics.weight,
+    bodyFatPercentage: biometrics.bodyFatPercentage ?? null,
 
-        // Activity (step 3)
-        activityLevel: activity.activityLevel,
-        dailySteps: activity.dailySteps ?? null,
-        sittingHours: activity.sittingHours ?? null,
-        workType: activity.workType ?? null,
+    activityLevel: activity.activityLevel,
+    dailySteps: activity.dailySteps ?? null,
+    sittingHours: activity.sittingHours ?? null,
+    workType: activity.workType ?? null,
 
-        // Training (step 4)
-        trainingLevel: training.trainingLevel,
-        trainingTypes: JSON.stringify(training.trainingTypes ?? []),
-        sessionDuration: mapSessionDuration(body.training.sessionDuration),
-        intensity: training.intensity ?? null,
-        workoutDaysPerWeek: training.trainingFrequency ?? 0,
-      },
-      create: {
-        userId: user.id,
+    trainingLevel: training.trainingLevel,
+    trainingTypes: JSON.stringify(training.trainingTypes ?? []),
+    sessionDuration: mapSessionDuration(training.sessionDuration),
+    intensity: training.intensity ?? null,
+    workoutDaysPerWeek: mapTrainingFrequency(training.trainingFrequency),
+  },
+  create: {
+    userId: user.id,
 
-        // Biometrics
-        age: biometrics.age,
-        gender: biometrics.gender,
-        heightCm: biometrics.height,
-        currentWeight: biometrics.weight,
-        bodyFatPercentage: biometrics.bodyFatPercentage ?? null,
+    age: biometrics.age,
+    gender: biometrics.gender,
+    heightCm: biometrics.height,
+    currentWeight: biometrics.weight,
+    bodyFatPercentage: biometrics.bodyFatPercentage ?? null,
 
-        // Activity
-        activityLevel: activity.activityLevel,
-        dailySteps: activity.dailySteps ?? null,
-        sittingHours: activity.sittingHours ?? null,
-        workType: activity.workType ?? null,
+    activityLevel: activity.activityLevel,
+    dailySteps: activity.dailySteps ?? null,
+    sittingHours: activity.sittingHours ?? null,
+    workType: activity.workType ?? null,
 
-        // Training
-        trainingLevel: training.trainingLevel,
-        trainingTypes: training.trainingTypes ?? [],
-        sessionDuration: mapSessionDuration(training.sessionDuration), // ✅ FIX
-        intensity: training.intensity ?? null,
-        workoutDaysPerWeek: training.trainingFrequency ?? 0,
-      },
+    trainingLevel: training.trainingLevel,
+    trainingTypes: JSON.stringify(training.trainingTypes ?? []),
+    sessionDuration: mapSessionDuration(training.sessionDuration),
+    intensity: training.intensity ?? null,
+    workoutDaysPerWeek: mapTrainingFrequency(training.trainingFrequency),
+  },
+});
 
-    });
 
     // 5) GUARDAR / ACTUALIZAR USER GOALS (Objetivos + Dieta + Macros)
     await prisma.userGoals.upsert({
